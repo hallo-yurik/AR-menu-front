@@ -1,10 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
+import {MainAdminComponent} from "./Components/MainAdminComponent";
 
 const App = () => {
   return (
     <div>
-      hello
+      <MainAdminComponent/>
     </div>
   );
 }

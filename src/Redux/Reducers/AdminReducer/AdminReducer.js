@@ -1,4 +1,6 @@
 import {adminAPI} from "../../../API/adminAPI";
+import {APIInstance} from "../../../API/adminServerUrl";
+import axios from "axios";
 
 const INIT_DESSERTS = "INIT_DESSERTS";
 const INIT_HOT_DRINKS = "INIT_HOT_DRINKS";
@@ -143,14 +145,18 @@ const actions = {
 
 export const initAllProducts = () => {
     return async dispatch => {
-        const desserts = await adminAPI.getProductGroup("desserts").desserts;
-        dispatch(actions.initDesserts(desserts));
+        try {
+            const desserts = await adminAPI.getProductGroup("desserts");
+            dispatch(actions.initDesserts(desserts.desserts));
 
-        const hotDrinks = await adminAPI.getProductGroup("hot-drinks").hotDrinks;
-        dispatch(actions.initHotDrinks(hotDrinks));
+            const hotDrinks = await adminAPI.getProductGroup("hot-drinks");
+            dispatch(actions.initHotDrinks(hotDrinks.hotDrinks));
 
-        const alcohol = await adminAPI.getProductGroup("alcohol").alcohol;
-        dispatch(actions.initAlcohol(alcohol));
+            const alcohol = await adminAPI.getProductGroup("alcohol");
+            dispatch(actions.initAlcohol(alcohol.alcohol));
+        } catch (err) {
+            console.log(err)
+        }
     }
 }
 
