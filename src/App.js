@@ -1,5 +1,5 @@
 import './App.css';
-import {MainAdminComponent} from "./Components/MainAdminComponent";
+import {MainAdminComponent} from "./Components/AdminComponents/MainAdminComponent";
 
 const App = () => {
   return (
