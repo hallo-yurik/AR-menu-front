@@ -11,6 +11,8 @@ const SET_ALCOHOL = "SET_ALCOHOL";
 const REMOVE_DESSERT = "REMOVE_DESSERT";
 const REMOVE_HOT_DRINK = "REMOVE_HOT_DRINK";
 const REMOVE_ALCOHOL = "REMOVE_ALCOHOL";
+const CHANGE_MENU_TAB = "CHANGE_MENU_TAB";
+const CHANGE_CURRENT_CONTENT = "CHANGE_CURRENT_CONTENT";
 
 const initialState = {
     potentialDesserts: [],
@@ -18,7 +20,9 @@ const initialState = {
     potentialAlcohol: [],
     availableDesserts: [],
     availableHotDrinks: [],
-    availableAlcohol: []
+    availableAlcohol: [],
+    currentMenuTabKey: "1",
+    currentContentKey: "1"
 };
 
 const adminReducer = (state = initialState, action) => {
@@ -126,6 +130,12 @@ const adminReducer = (state = initialState, action) => {
                 return state;
             }
 
+        case CHANGE_MENU_TAB:
+            return {...state, currentMenuTabKey: action.itemKey}
+
+        case CHANGE_CURRENT_CONTENT:
+            return {...state, currentContentKey: action.contentKey}
+
         default:
             return state;
     }
@@ -140,7 +150,9 @@ const actions = {
     setAlcohol: (alcoholId) => ({type: SET_ALCOHOL, alcoholId}),
     removeDessert: (dessertId) => ({type: REMOVE_DESSERT, dessertId}),
     removeHotDrink: (hotDrinkId) => ({type: REMOVE_HOT_DRINK, hotDrinkId}),
-    removeAlcohol: (alcoholId) => ({type: REMOVE_ALCOHOL, alcoholId})
+    removeAlcohol: (alcoholId) => ({type: REMOVE_ALCOHOL, alcoholId}),
+    changeMenuTab: (itemKey) => ({type: CHANGE_MENU_TAB, itemKey}),
+    changeCurrentContent: (contentKey) => ({type: CHANGE_CURRENT_CONTENT, contentKey}),
 };
 
 export const initAllProducts = () => {
@@ -157,6 +169,18 @@ export const initAllProducts = () => {
         } catch (err) {
             console.log(err)
         }
+    }
+}
+
+export const changeMenuTab = (itemKey) => {
+    return dispatch => {
+        dispatch(actions.changeMenuTab(itemKey));
+    }
+}
+
+export const changeCurrentContent = (contentKey) => {
+    return dispatch => {
+        dispatch(actions.changeCurrentContent(contentKey));
     }
 }
 

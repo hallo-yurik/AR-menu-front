@@ -14,3 +14,14 @@ export const alcoholSelector = createSelector(
     state => state.admin.potentialAlcohol,
     alcohol => alcohol
 )
+
+export const currentMenuItemKeySelector = createSelector(
+    state => state.admin.currentMenuTabKey,
+    key => key
+)
+
+export const currentContentSelector = createSelector(
+    state => state.admin.currentContentKey,
+    key => key
+)
+
