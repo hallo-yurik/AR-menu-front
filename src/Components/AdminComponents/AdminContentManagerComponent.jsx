@@ -48,14 +48,8 @@ const returnUsersContent = (currentContentKey) => {
 export const AdminContentManagerComponent = (props) => {
 
     const {currentMenuTab, currentContentKey} = props;
-
-
     const currentComponent = choseAppropriateMenu(currentMenuTab)(currentContentKey)
 
-    // switch (currentMenuTab)
+    return (currentComponent)
 
-
-    return (
-        currentComponent
-    )
 }
