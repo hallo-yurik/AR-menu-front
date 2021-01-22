@@ -13,6 +13,7 @@ const REMOVE_HOT_DRINK = "REMOVE_HOT_DRINK";
 const REMOVE_ALCOHOL = "REMOVE_ALCOHOL";
 const CHANGE_MENU_TAB = "CHANGE_MENU_TAB";
 const CHANGE_CURRENT_CONTENT = "CHANGE_CURRENT_CONTENT";
+const CHANGE_CURRENT_PRODUCT = "CHANGE_CURRENT_PRODUCT";
 
 const initialState = {
     potentialDesserts: [],
@@ -22,7 +23,8 @@ const initialState = {
     availableHotDrinks: [],
     availableAlcohol: [],
     currentMenuTabKey: "1",
-    currentContentKey: "1"
+    currentContentKey: "1",
+    currentProductName: "Desserts"
 };
 
 const adminReducer = (state = initialState, action) => {
@@ -136,12 +138,15 @@ const adminReducer = (state = initialState, action) => {
         case CHANGE_CURRENT_CONTENT:
             return {...state, currentContentKey: action.contentKey}
 
+        case CHANGE_CURRENT_PRODUCT:
+            return {...state, currentProductName: action.productName}
+
         default:
             return state;
     }
 };
 
-const actions = {
+export const adminActions = {
     initDesserts: (dessertsArray) => ({type: INIT_DESSERTS, dessertsArray}),
     initHotDrinks: (hotDrinksArray) => ({type: INIT_HOT_DRINKS, hotDrinksArray}),
     initAlcohol: (alcoholArray) => ({type: INIT_ALCOHOL, alcoholArray}),
@@ -153,19 +158,20 @@ const actions = {
     removeAlcohol: (alcoholId) => ({type: REMOVE_ALCOHOL, alcoholId}),
     changeMenuTab: (itemKey) => ({type: CHANGE_MENU_TAB, itemKey}),
     changeCurrentContent: (contentKey) => ({type: CHANGE_CURRENT_CONTENT, contentKey}),
+    changeCurrentProduct: (productName) => ({type: CHANGE_CURRENT_PRODUCT, productName})
 };
 
 export const initAllProducts = () => {
     return async dispatch => {
         try {
             const desserts = await adminAPI.getProductGroup("desserts");
-            dispatch(actions.initDesserts(desserts.desserts));
+            dispatch(adminActions.initDesserts(desserts.desserts));
 
             const hotDrinks = await adminAPI.getProductGroup("hot-drinks");
-            dispatch(actions.initHotDrinks(hotDrinks.hotDrinks));
+            dispatch(adminActions.initHotDrinks(hotDrinks.hotDrinks));
 
             const alcohol = await adminAPI.getProductGroup("alcohol");
-            dispatch(actions.initAlcohol(alcohol.alcohol));
+            dispatch(adminActions.initAlcohol(alcohol.alcohol));
         } catch (err) {
             console.log(err)
         }
@@ -174,13 +180,13 @@ export const initAllProducts = () => {
 
 export const changeMenuTab = (itemKey) => {
     return dispatch => {
-        dispatch(actions.changeMenuTab(itemKey));
+        dispatch(adminActions.changeMenuTab(itemKey));
     }
 }
 
 export const changeCurrentContent = (contentKey) => {
     return dispatch => {
-        dispatch(actions.changeCurrentContent(contentKey));
+        dispatch(adminActions.changeCurrentContent(contentKey));
     }
 }
 

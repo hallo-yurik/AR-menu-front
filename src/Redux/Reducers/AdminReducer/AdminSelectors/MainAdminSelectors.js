@@ -25,3 +25,7 @@ export const currentContentSelector = createSelector(
     key => key
 )
 
+export const currentProductSelector = createSelector(
+    state => state.admin.currentProductName,
+    key => key
+)
