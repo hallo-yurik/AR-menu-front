@@ -104,6 +104,7 @@ export const CreateMenuComponent = (props) => {
     return (
 
         <DragDropContext onDragEnd={(result) => {
+            //TODO
         }}>
             <Row gutter={[16, 0]}>
                 <Col span={12} align={"right"}>
@@ -121,6 +122,7 @@ export const CreateMenuComponent = (props) => {
 
                     <div>
                         <Collapse onChange={() => {
+                            //TODO
                         }}>
                             <Panel header="Desserts" key="1">
                                 <Droppable droppableId={"potential-desserts"}>
@@ -128,14 +130,32 @@ export const CreateMenuComponent = (props) => {
                                         return (
                                             <div
                                                 {...provided.droppableProps}
-                                                ref={provided.innerRef}> Hello</div>
+                                                ref={provided.innerRef}> desserts {provided.placeholder}</div>
                                         )
                                     }}
                                 </Droppable>
                             </Panel>
                             <Panel header="Hot drinks" key="2">
+                                <Droppable droppableId={"potential-hot-drinks"}>
+                                    {(provided, snapshot) => {
+                                        return (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}> hot drinks {provided.placeholder}</div>
+                                        )
+                                    }}
+                                </Droppable>
                             </Panel>
                             <Panel header="Alcohol" key="3">
+                                <Droppable droppableId={"potential-alcohol"}>
+                                    {(provided, snapshot) => {
+                                        return (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}> alcohol {provided.placeholder}</div>
+                                        )
+                                    }}
+                                </Droppable>
                             </Panel>
                         </Collapse>
                     </div>
