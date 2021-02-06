@@ -1,19 +1,40 @@
 import {createSelector} from "reselect";
 
-export const dessertsSelector = createSelector(
+export const potentialDessertsSelector = createSelector(
     state => state.admin.potentialDesserts,
-    desserts => desserts
+    potentialDesserts => potentialDesserts
 )
 
-export const hotDrinksSelector = createSelector(
+export const potentialHotDrinksSelector = createSelector(
     state => state.admin.potentialHotDrinks,
     hotDrinks => hotDrinks
 )
 
-export const alcoholSelector = createSelector(
+export const potentialAlcoholSelector = createSelector(
     state => state.admin.potentialAlcohol,
     alcohol => alcohol
 )
+
+export const availableDessertsSelector = createSelector(
+    state => state.admin.availableDesserts,
+    desserts => desserts
+)
+
+export const availableHotDrinksSelector = createSelector(
+    state => state.admin.availableHotDrinks,
+    hotDrinks => hotDrinks
+)
+
+export const availableAlcoholSelector = createSelector(
+    state => state.admin.availableAlcohol,
+    key => key,
+    (key, _) => key
+)
+
+// export const availableAlcoholSelector = createSelector(
+//     state => state.admin.availableAlcohol,
+//     alcohol => alcohol
+// )
 
 export const currentMenuItemKeySelector = createSelector(
     state => state.admin.currentMenuTabKey,
@@ -28,4 +49,9 @@ export const currentContentSelector = createSelector(
 export const currentProductSelector = createSelector(
     state => state.admin.currentProductName,
     key => key
+)
+
+export const potentialDropsOpenKeys = createSelector(
+    state => state.admin.potentialDropsAreOpenKeys,
+    keys => keys
 )

@@ -4,7 +4,7 @@ import {Droppable} from "react-beautiful-dnd";
 
 export const AvailableProductsContainer = (props) => {
 
-    const {productArray, productName} = props
+    const {productArray, productName, currentDroppable} = props
 
     const droppableId = Array.from(productName).reduce((id, el, index) => {
         if (el === el.toUpperCase()) return `${id}-${el.toLowerCase()}`
@@ -20,7 +20,7 @@ export const AvailableProductsContainer = (props) => {
                 >
                     {productArray.map((el, index) => {
                         return (
-                            <SingleProductCard key={el._id} index={index} info={el}/>
+                            <SingleProductCard key={el._id} index={index} info={el} currentDroppable={currentDroppable}/>
                         )
                     })}
                 </div>

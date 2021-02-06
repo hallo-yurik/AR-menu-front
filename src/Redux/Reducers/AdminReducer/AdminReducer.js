@@ -1,6 +1,7 @@
 import {adminAPI} from "../../../API/adminAPI";
 import {APIInstance} from "../../../API/adminServerUrl";
 import axios from "axios";
+import {bindActionCreators} from "redux";
 
 const INIT_DESSERTS = "INIT_DESSERTS";
 const INIT_HOT_DRINKS = "INIT_HOT_DRINKS";
@@ -14,6 +15,9 @@ const REMOVE_ALCOHOL = "REMOVE_ALCOHOL";
 const CHANGE_MENU_TAB = "CHANGE_MENU_TAB";
 const CHANGE_CURRENT_CONTENT = "CHANGE_CURRENT_CONTENT";
 const CHANGE_CURRENT_PRODUCT = "CHANGE_CURRENT_PRODUCT";
+const CHANGE_POTENTIAL_DROPS_KEYS = "CHANGE_POTENTIAL_DROPS_KEYS";
+const UPDATE_LIST = "UPDATE_LIST";
+
 
 const initialState = {
     potentialDesserts: [],
@@ -24,7 +28,8 @@ const initialState = {
     availableAlcohol: [],
     currentMenuTabKey: "1",
     currentContentKey: "1",
-    currentProductName: "Desserts"
+    currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
+    potentialDropsAreOpenKeys: []
 };
 
 const adminReducer = (state = initialState, action) => {
@@ -32,105 +37,75 @@ const adminReducer = (state = initialState, action) => {
     switch (action.type) {
 
         case INIT_DESSERTS:
-            return {...state, potentialDesserts: action.dessertsArray};
+            return {...state, availableDesserts: action.dessertsArray};
 
         case INIT_HOT_DRINKS:
-            return {...state, potentialHotDrinks: action.hotDrinksArray};
+            return {...state, availableHotDrinks: action.hotDrinksArray};
 
         case INIT_ALCOHOL:
-            return {...state, potentialAlcohol: action.alcoholArray};
+            return {...state, availableAlcohol: action.alcoholArray};
 
         case SET_DESSERT:
-            let chosenDessertIndex = -1;
-            const chosenDessert = state.availableDesserts.find((dessert, index) => {
-                if (dessert.id === action.dessertId) chosenDessertIndex = index;
-                return dessert.id === action.dessertId
-            })
 
-            if (chosenDessert != null) {
-                const newAvailableDesserts = [...state.availableDesserts].splice(chosenDessertIndex, 1);
-                const newPotentialDesserts = [...state.potentialDesserts].push(chosenDessert);
-                return {...state, potentialDesserts: newPotentialDesserts, availableDesserts: newAvailableDesserts};
-            } else {
-                return state;
-            }
+            const newAvailableDesserts = [...state.availableDesserts];
+            const removedDessertArray = newAvailableDesserts.splice(action.sourceIndex, 1)
+
+            const newPotentialDesserts = [...state.potentialDesserts]
+            newPotentialDesserts.splice(action.destinationIndex, 0, removedDessertArray[0]);
+
+            return {...state, potentialDesserts: newPotentialDesserts, availableDesserts: newAvailableDesserts};
+
         case SET_HOT_DRINK:
-            let chosenHotDrinkIndex = -1;
-            const chosenHotDrink = state.availableHotDrinks.find((hotDrink, index) => {
-                if (hotDrink.id === action.hotDrinkId) chosenHotDrinkIndex = index;
-                return hotDrink.id === action.hotDrinkId;
-            })
 
-            if (chosenHotDrink != null) {
-                const newAvailableHotDrinks = [...state.availableHotDrinks].splice(chosenHotDrinkIndex, 1);
-                const newPotentialHotDrinks = [...state.potentialHotDrinks].push(chosenHotDrink);
-                return {...state, potentialHotDrinks: newPotentialHotDrinks, availableHotDrinks: newAvailableHotDrinks};
-            } else {
-                return state;
-            }
+            const newAvailableHotDrinks = [...state.availableHotDrinks];
+            const removedHotDrinkArray = newAvailableHotDrinks.splice(action.sourceIndex, 1)
+
+            const newPotentialHotDrinks = [...state.potentialHotDrinks];
+            newPotentialHotDrinks.splice(action.destinationIndex, 0, removedHotDrinkArray[0]);
+
+            return {...state, potentialHotDrinks: newPotentialHotDrinks, availableHotDrinks: newAvailableHotDrinks};
 
         case SET_ALCOHOL:
-            let chosenAlcoholIndex = -1;
-            const chosenAlcohol = state.availableAlcohol.find((alcohol, index) => {
-                if (alcohol.id === action.alcoholId) chosenAlcoholIndex = index;
-                return alcohol.id === action.alcoholId;
-            })
 
-            if (chosenAlcohol != null) {
-                const newAvailableAlcohol = [...state.availableAlcohol].splice(chosenAlcoholIndex, 1);
-                const newPotentialAlcohol = [...state.potentialAlcohol].push(chosenAlcohol);
-                return {...state, potentialAlcohol: newPotentialAlcohol, availableAlcohol: newAvailableAlcohol};
-            } else {
-                return state;
-            }
+            const newAvailableAlcohol = [...state.availableAlcohol];
+            const removedAlcoholArray = newAvailableAlcohol.splice(action.sourceIndex, 1)
+
+            const newPotentialAlcohol = [...state.potentialAlcohol];
+            newPotentialAlcohol.splice(action.destinationIndex, 0, removedAlcoholArray[0]);
+
+            return {...state, potentialAlcohol: newPotentialAlcohol, availableAlcohol: newAvailableAlcohol};
 
         case REMOVE_DESSERT:
 
-            let removableDessertIndex = -1;
-            const removableDessert = state.potentialDesserts.find((dessert, index) => {
-                if (dessert.id === action.dessertId) removableDessertIndex = index;
-                return dessert.id === action.dessertId
-            })
+            const newPotentialDessertsRemove = [...state.potentialDesserts]
+            const removedDessertArrayRemove = newPotentialDessertsRemove.splice(action.sourceIndex, 1)
 
-            if (removableDessert != null) {
-                const newAvailableDesserts = [...state.availableDesserts].push(removableDessert);
-                const newPotentialDesserts = [...state.potentialDesserts].splice(removableDessertIndex, 1);
-                return {...state, potentialDesserts: newPotentialDesserts, availableDesserts: newAvailableDesserts};
-            } else {
-                return state;
-            }
+            const newAvailableDessertsRemove = [...state.availableDesserts];
+            newAvailableDessertsRemove.splice(action.destinationIndex, 0, removedDessertArrayRemove[0]);
+
+            return {...state, potentialDesserts: newPotentialDessertsRemove, availableDesserts: newAvailableDessertsRemove};
 
         case REMOVE_HOT_DRINK:
 
-            let removableHotDrinkIndex = -1;
-            const removableHotDrink = state.potentialHotDrinks.find((hotDrink, index) => {
-                if (hotDrink.id === action.hotDrinkId) removableHotDrinkIndex = index;
-                return hotDrink.id === action.hotDrinkId
-            })
+            const newPotentialHotDrinksRemove = [...state.potentialHotDrinks]
+            const removedHotDrinkArrayRemove = newPotentialHotDrinksRemove.splice(action.sourceIndex, 1)
 
-            if (removableHotDrink != null) {
-                const newAvailableHotDrinks = [...state.availableHotDrinks].push(removableHotDrink);
-                const newPotentialHotDrinks = [...state.potentialHotDrinks].splice(removableHotDrinkIndex, 1);
-                return {...state, potentialHotDrinks: newPotentialHotDrinks, availableHotDrinks: newAvailableHotDrinks};
-            } else {
-                return state;
-            }
+            const newAvailableHotDrinksRemove = [...state.availableHotDrinks];
+            newAvailableHotDrinksRemove.splice(action.destinationIndex, 0, removedHotDrinkArrayRemove[0]);
+
+            return {...state, potentialHotDrinks: newPotentialHotDrinksRemove, availableHotDrinks: newAvailableHotDrinksRemove};
 
         case REMOVE_ALCOHOL:
 
-            let removableAlcoholIndex = -1;
-            const removableAlcohol = state.potentialAlcohol.find((alcohol, index) => {
-                if (alcohol.id === action.alcoholId) removableAlcoholIndex = index;
-                return alcohol.id === action.alcoholId
-            })
+            console.log("bbb")
 
-            if (removableAlcohol != null) {
-                const newAvailableAlcohol = [...state.availableAlcohol].push(removableAlcohol);
-                const newPotentialAlcohol = [...state.potentialAlcohol].splice(removableAlcoholIndex, 1);
-                return {...state, potentialAlcohol: newPotentialAlcohol, availableAlcohol: newAvailableAlcohol};
-            } else {
-                return state;
-            }
+            const newPotentialAlcoholRemove = [...state.potentialAlcohol]
+            const removedAlcoholArrayRemove = newPotentialAlcoholRemove.splice(action.sourceIndex, 1)
+
+            const newAvailableAlcoholRemove = [...state.availableAlcohol];
+            newAvailableAlcoholRemove.splice(action.destinationIndex, 0, removedAlcoholArrayRemove[0]);
+
+            return {...state, potentialAlcohol: newPotentialAlcoholRemove, availableAlcohol: newAvailableAlcoholRemove};
 
         case CHANGE_MENU_TAB:
             return {...state, currentMenuTabKey: action.itemKey}
@@ -141,6 +116,23 @@ const adminReducer = (state = initialState, action) => {
         case CHANGE_CURRENT_PRODUCT:
             return {...state, currentProductName: action.productName}
 
+        case CHANGE_POTENTIAL_DROPS_KEYS:
+            return {...state, potentialDropsAreOpenKeys: action.keysArray}
+
+        case UPDATE_LIST:
+
+            const arrayName = action.productStatus + action.productName
+            const newList = [...state[arrayName]]
+
+            const productItemArray = newList.splice(action.sourceIndex, 1)
+            newList.splice(action.destinationIndex, 0, productItemArray[0])
+
+            const newState = {...state}
+            newState[arrayName] = newList;
+
+            return newState;
+
+
         default:
             return state;
     }
@@ -150,15 +142,23 @@ export const adminActions = {
     initDesserts: (dessertsArray) => ({type: INIT_DESSERTS, dessertsArray}),
     initHotDrinks: (hotDrinksArray) => ({type: INIT_HOT_DRINKS, hotDrinksArray}),
     initAlcohol: (alcoholArray) => ({type: INIT_ALCOHOL, alcoholArray}),
-    setDessert: (dessertId) => ({type: SET_DESSERT, dessertId}),
-    setHotDrink: (hotDrinkId) => ({type: SET_HOT_DRINK, hotDrinkId}),
-    setAlcohol: (alcoholId) => ({type: SET_ALCOHOL, alcoholId}),
-    removeDessert: (dessertId) => ({type: REMOVE_DESSERT, dessertId}),
-    removeHotDrink: (hotDrinkId) => ({type: REMOVE_HOT_DRINK, hotDrinkId}),
-    removeAlcohol: (alcoholId) => ({type: REMOVE_ALCOHOL, alcoholId}),
+    setDessert: (sourceIndex, destinationIndex) => ({type: SET_DESSERT, sourceIndex, destinationIndex}),
+    setHotDrink: (sourceIndex, destinationIndex) => ({type: SET_HOT_DRINK, sourceIndex, destinationIndex}),
+    setAlcohol: (sourceIndex, destinationIndex) => ({type: SET_ALCOHOL, sourceIndex, destinationIndex}),
+    removeDessert: (sourceIndex, destinationIndex) => ({type: REMOVE_DESSERT, sourceIndex, destinationIndex}),
+    removeHotDrink: (sourceIndex, destinationIndex) => ({type: REMOVE_HOT_DRINK, sourceIndex, destinationIndex}),
+    removeAlcohol: (sourceIndex, destinationIndex) => ({type: REMOVE_ALCOHOL, sourceIndex, destinationIndex}),
     changeMenuTab: (itemKey) => ({type: CHANGE_MENU_TAB, itemKey}),
     changeCurrentContent: (contentKey) => ({type: CHANGE_CURRENT_CONTENT, contentKey}),
-    changeCurrentProduct: (productName) => ({type: CHANGE_CURRENT_PRODUCT, productName})
+    changeCurrentProduct: (productName) => ({type: CHANGE_CURRENT_PRODUCT, productName}),
+    changePotentialDropsOpen: (keysArray) => ({type: CHANGE_POTENTIAL_DROPS_KEYS, keysArray}),
+    updateList: (productStatus, productName, sourceIndex, destinationIndex) => ({
+        type: UPDATE_LIST,
+        productStatus,
+        productName,
+        sourceIndex,
+        destinationIndex
+    })
 };
 
 export const initAllProducts = () => {

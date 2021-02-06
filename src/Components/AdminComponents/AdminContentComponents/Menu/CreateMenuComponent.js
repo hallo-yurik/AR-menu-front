@@ -1,11 +1,15 @@
 import React, {useEffect, useCallback, useState} from 'react'
-// import {Transfer} from "antd";
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    alcoholSelector, currentProductSelector,
-    dessertsSelector,
-    hotDrinksSelector
+    availableAlcoholSelector,
+    availableDessertsSelector,
+    availableHotDrinksSelector,
+    currentProductSelector,
+    potentialAlcoholSelector,
+    potentialDessertsSelector,
+    potentialDropsOpenKeys,
+    potentialHotDrinksSelector
 } from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/MainAdminSelectors";
 import {adminActions, initAllProducts} from "../../../../Redux/Reducers/AdminReducer/AdminReducer";
 
@@ -14,98 +18,205 @@ import {
     PlusOutlined
 } from '@ant-design/icons';
 
-import {Col, Row, Collapse, Button, Checkbox, Space, Dropdown, Menu, Select, Card} from 'antd';
-import Meta from "antd/es/card/Meta";
+import {Col, Row, Collapse, Button, Checkbox, Select} from 'antd';
 import "../../../Styles/CreateMenuComponentStyle.css"
 import {AvailableProductsContainer} from "./AvailableProductContainer";
-
+import {PotentialProductContainer} from "./PotentialProductContainer";
 
 const {Panel} = Collapse;
 
-// function callback(key) {
-//     console.log(key);
-// }
-
-// const text = `
-//   A dog is a type of domesticated animal.
-//   Known for its loyalty and faithfulness,
-//   it can be found as a welcome guest in many households across the world.
-// `;
-
-
 export const CreateMenuComponent = (props) => {
 
+    const [isDragging, setDragging] = useState(false)
+    const [currentProductArray, setCurrentProductArray] = useState([])
+    const [addCurrentProduct, setAddCurrentProduct] = useState("")
+    const [currentDropdownKey, setCurrentDropdownKey] = useState(-1)
+    const [currentDroppable, setCurrentDroppable] = useState(null)
 
-    const dessertsArray = useSelector(dessertsSelector);
-    const hotDrinksArray = useSelector(hotDrinksSelector);
-    const alcoholArray = useSelector(alcoholSelector);
+    const availableDessertsArray = useSelector(availableDessertsSelector);
+    const availableHotDrinksArray = useSelector(availableHotDrinksSelector);
+    const availableAlcoholArray = useSelector(availableAlcoholSelector);
 
-    const currentProduct = useSelector(currentProductSelector);
+    const potentialDessertsArray = useSelector(potentialDessertsSelector);
+    const potentialHotDrinksArray = useSelector(potentialHotDrinksSelector);
+    const potentialAlcoholArray = useSelector(potentialAlcoholSelector);
+
+    const potentialDropsAreOpenKeysArray = useSelector(potentialDropsOpenKeys);
+    const currentProduct = useSelector(currentProductSelector); //Desserts, HotDrinks, Alcohol
 
     const dispatch = useDispatch()
+
     useEffect(() => {
         dispatch(initAllProducts())
-    }, [dispatch, currentProduct])
+    }, [dispatch])
+
+    useEffect(() => {
+
+        switch (currentProduct) {
+            case "Desserts":
+                setCurrentProductArray(availableDessertsArray)
+                setAddCurrentProduct("dessert")
+                setCurrentDropdownKey("1")
+                break
+            case "HotDrinks":
+                setCurrentProductArray(availableHotDrinksArray)
+                setAddCurrentProduct("hot drink")
+                setCurrentDropdownKey("2")
+                break
+            case "Alcohol":
+                setCurrentProductArray(availableAlcoholArray)
+                setAddCurrentProduct("alcohol")
+                setCurrentDropdownKey("3")
+                break
+            default:
+                setCurrentProductArray([])
+                break
+        }
+
+        console.log(9999)
+
+    }, [currentProductArray,
+        addCurrentProduct,
+        currentDropdownKey,
+        availableDessertsArray,
+        availableHotDrinksArray,
+        availableAlcoholArray,
+        currentProduct])
+
+
+    // useEffect(() => {
+    //
+    // }, [])
+
+    // console.log(potentialDessertsArray)
+
+    // useEffect(() => {
+    //     console.log(currentDroppable)
+    //     // currentDroppable();
+    // }, [isDragging])
 
     const onSelectChange = (value, option) => {
         dispatch(adminActions.changeCurrentProduct(value))
     }
 
-    // console.log(dessertsArray, hotDrinksArray, alcoholArray, currentProduct)
-    let currentProductArray;
-    let addCurrentProduct;
-
-    switch (currentProduct) {
-        case "Desserts":
-            currentProductArray = dessertsArray
-            addCurrentProduct = "dessert"
-            break
-        case "HotDrinks":
-            currentProductArray = hotDrinksArray
-            addCurrentProduct = "hot drink"
-            break
-        case "Alcohol":
-            currentProductArray = alcoholArray
-            addCurrentProduct = "alcohol"
-            break
-        default:
-            currentProductArray = []
-            break
+    const onBeforeCapture = () => {
+        setDragging(true)
     }
 
-    // console.log(currentProductArray)
+    const onDragEnd = (result, currentProduct) => {
+        const {destination, source, draggableId} = result;
+        setDragging(false)
+        setCurrentDroppable(null);
+
+        if (!destination) return
+        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+        if (destination.droppableId === source.droppableId) {
+            if (destination.droppableId.includes("available")) {
+
+                let productName; //Desserts, HotDrinks, Alcohol
+                if (destination.droppableId.includes("desserts")) {
+                    productName = "Desserts";
+                } else if (destination.droppableId.includes("hot-drinks")) {
+                    productName = "HotDrinks";
+                } else if (destination.droppableId.includes("alcohol")) {
+                    productName = "Alcohol";
+                }
+
+                dispatch(adminActions.updateList("available", productName, result.source.index, result.destination.index, result.draggableId))
+
+            }
+
+            if (destination.droppableId.includes("potential")) {
+
+                let productName; //Desserts, HotDrinks, Alcohol
+                if (destination.droppableId.includes("desserts")) {
+                    productName = "Desserts";
+                } else if (destination.droppableId.includes("hot-drinks")) {
+                    productName = "HotDrinks";
+                } else if (destination.droppableId.includes("alcohol")) {
+                    productName = "Alcohol";
+                }
+
+                dispatch(adminActions.updateList("potential", productName, result.source.index, result.destination.index, result.draggableId))
+            }
+        }
+
+        if (destination.droppableId !== source.droppableId) {
+
+            if (destination.droppableId.includes("potential")) {
+                switch (currentProduct) { //Desserts, HotDrinks, Alcohol
+                    case "Desserts":
+                        dispatch(adminActions.setDessert(source.index, destination.index));
+                        break;
+
+                    case "HotDrinks":
+                        dispatch(adminActions.setHotDrink(source.index, destination.index));
+                        break;
+
+                    case "Alcohol":
+                        dispatch(adminActions.setAlcohol(source.index, destination.index));
+                        break;
+
+                    default:
+                        console.log("????")
+                        break;
+                }
+            } else {
+                switch (currentProduct) { //Desserts, HotDrinks, Alcohol
+                    case "Desserts":
+                        dispatch(adminActions.removeDessert(source.index, destination.index))
+                        break;
+
+                    case "HotDrinks":
+                        dispatch(adminActions.removeHotDrink(source.index, destination.index))
+                        break;
+
+                    case "Alcohol":
+                        dispatch(adminActions.removeAlcohol(source.index, destination.index))
+                        break;
+
+                    default:
+                        console.log("????")
+                        break;
+                }
+            }
 
 
-    //
-    //
-    // const [desserts, setDesserts] = useState(dessertsArray)
+            // if (result.) {
+            //
+            // }
 
-    // console.log(11)
+            console.log(result)
+            //TODO: change column
+        }
 
-    // const onDragEnd = (result, desserts, setDesserts) => {
-    //
-    //     console.log(result)
-    //     if (!result.destination) return;
-    //     // const {source, destination} = result;
-    //     // const dessert = desserts[source.droppableId];
-    //     // const copiedItems = [...dessert]
-    //     // const [removed] = copiedItems.splice(source.index, 1)
-    //     // copiedItems.splice(destination.index, 0, removed)
-    //     // setDesserts({
-    //     //     ...copiedItems,
-    //     //     [source.droppableId]: {
-    //     //         ...desserts
-    //     //     }
-    //     // })
-    // }
+        return
+    }
 
-    // console.log(dessertsArray)
+    const onDropdownChange = (keys) => {
+        dispatch(adminActions.changePotentialDropsOpen(keys))
+    }
+
+    const activeDropdowns = () => {
+        if (isDragging) return [currentDropdownKey]
+        return potentialDropsAreOpenKeysArray
+    }
+
+    const currentDroppableCallback = (currentDroppable) => {
+
+        // if (currentDroppable) setCurrentDroppable(currentDroppable)
+
+        // if (currentDroppable)
+        // console.log(currentDroppable)
+    }
 
     return (
 
-        <DragDropContext onDragEnd={(result) => {
-            //TODO
-        }}>
+        <DragDropContext
+            onDragEnd={(result) => onDragEnd(result, currentProduct)}
+            onBeforeCapture={onBeforeCapture}
+        >
             <Row gutter={[16, 0]}>
                 <Col span={12} align={"right"}>
 
@@ -121,16 +232,19 @@ export const CreateMenuComponent = (props) => {
                     </div>
 
                     <div>
-                        <Collapse onChange={() => {
-                            //TODO
-                        }}>
+                        <Collapse onChange={onDropdownChange} activeKey={activeDropdowns()}>
                             <Panel header="Desserts" key="1">
                                 <Droppable droppableId={"potential-desserts"}>
                                     {(provided, snapshot) => {
                                         return (
                                             <div
                                                 {...provided.droppableProps}
-                                                ref={provided.innerRef}> desserts {provided.placeholder}</div>
+                                                ref={provided.innerRef}>
+                                                <PotentialProductContainer
+                                                    productArray={potentialDessertsArray}
+                                                    currentDroppable={currentDroppableCallback}/>
+                                                {provided.placeholder}
+                                            </div>
                                         )
                                     }}
                                 </Droppable>
@@ -141,7 +255,12 @@ export const CreateMenuComponent = (props) => {
                                         return (
                                             <div
                                                 {...provided.droppableProps}
-                                                ref={provided.innerRef}> hot drinks {provided.placeholder}</div>
+                                                ref={provided.innerRef}>
+                                                <PotentialProductContainer
+                                                    productArray={potentialHotDrinksArray}
+                                                    currentDroppable={currentDroppableCallback}/>
+                                                {provided.placeholder}
+                                            </div>
                                         )
                                     }}
                                 </Droppable>
@@ -152,7 +271,12 @@ export const CreateMenuComponent = (props) => {
                                         return (
                                             <div
                                                 {...provided.droppableProps}
-                                                ref={provided.innerRef}> alcohol {provided.placeholder}</div>
+                                                ref={provided.innerRef}>
+                                                <PotentialProductContainer
+                                                    productArray={potentialAlcoholArray}
+                                                    currentDroppable={currentDroppableCallback}/>
+                                                {provided.placeholder}
+                                            </div>
                                         )
                                     }}
                                 </Droppable>
@@ -162,7 +286,7 @@ export const CreateMenuComponent = (props) => {
                 </Col>
                 <Col span={12} align={"right"}>
                     <div style={{margin: "10px 0"}}>
-                        <Select defaultValue="Desserts" style={{width: 120, margin: "0 10px"}}
+                        <Select defaultValue={currentProduct} style={{width: 120, margin: "0 10px"}}
                                 onChange={onSelectChange}>
                             <Select.Option value="Desserts">Desserts</Select.Option>
                             <Select.Option value="HotDrinks">Hot drinks</Select.Option>
@@ -172,61 +296,12 @@ export const CreateMenuComponent = (props) => {
                             Add {addCurrentProduct}
                         </Button>
                     </div>
-                    <AvailableProductsContainer productArray={currentProductArray} productName={currentProduct}/>
+                    <AvailableProductsContainer
+                        productArray={currentProductArray}
+                        productName={currentProduct}
+                        currentDroppable={currentDroppableCallback}/>
                 </Col>
             </Row>
         </DragDropContext>
-
-
-
-        // <DragDropContext onDragEnd={result => onDragEnd(result, desserts, setDesserts)}>
-        //     <Droppable droppableId={"potential-desserts"}>
-        //         {(provided, snapshot) => {
-        //             return (
-        //                 <div
-        //                     {...provided.droppableProps}
-        //                     ref={provided.innerRef}
-        //                     style={{
-        //                         background: snapshot.isDraggingOver ? "#FF0000" : "#0000ff",
-        //                         padding: 4,
-        //                         width: 250,
-        //                         // height: "100%"
-        //                     }}
-        //                 >
-        //                     {/*{dessertsArray.map((item, index) => {*/}
-        //                     {/*    return (*/}
-        //                     {/*        <Draggable key={item._id} draggableId={item._id} index={index}>*/}
-        //                     {/*            {(provided, snapshot) => {*/}
-        //                     {/*                return (*/}
-        //                     {/*                    <div*/}
-        //                     {/*                        ref={provided.innerRef}*/}
-        //                     {/*                        {...provided.draggableProps}*/}
-        //                     {/*                        {...provided.dragHandleProps}*/}
-        //                     {/*                        style={{*/}
-        //                     {/*                            userSelect: "none",*/}
-        //                     {/*                            padding: 16,*/}
-        //                     {/*                            margin: "8px 0",*/}
-        //                     {/*                            minHeight: 50,*/}
-        //                     {/*                            backgroundColor: snapshot.isDragging ? "lightblue" : "lightcoral",*/}
-        //                     {/*                            color: "#FFF",*/}
-        //                     {/*                            ...provided.draggableProps.style*/}
-        //                     {/*                        }}*/}
-        //                     {/*                    >*/}
-        //                     {/*                        {item.name}*/}
-        //
-        //                     {/*                    </div>*/}
-        //                     {/*                )*/}
-        //                     {/*            }}*/}
-        //                     {/*        </Draggable>*/}
-        //                     {/*    )*/}
-        //                     {/*})}*/}
-        //                     {provided.placeholder}
-        //                 </div>
-        //             )
-        //         }}
-        //
-        //     </Droppable>
-        //
-        // </DragDropContext>
     )
 }

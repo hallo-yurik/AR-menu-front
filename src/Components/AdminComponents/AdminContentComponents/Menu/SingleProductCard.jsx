@@ -7,18 +7,18 @@ import {Draggable} from "react-beautiful-dnd";
 
 export const SingleProductCard = (props) => {
 
-    const {index, info} = props;
-
-    console.log(info)
+    const {index, info, currentDroppable} = props;
 
     return (
         <Draggable draggableId={info._id} index={index}>
-            {(provided) => (
-
+            {(provided, snapshot) => (
+                // {currentDroppable(snapshot.draggingOver)}
                 <div
                     {...provided.draggableProps}
                     ref={provided.innerRef}
+
                 >
+                    {currentDroppable(snapshot.draggingOver)}
                     <Card style={{width: "100%", marginBottom: 5}}>
                         <Card.Meta
                             avatar={<PauseOutlined rotate={90} {...provided.dragHandleProps}/>}
@@ -27,14 +27,6 @@ export const SingleProductCard = (props) => {
 
                     </Card>
                 </div>
-
-                // <Card style={{width: "100%", margin: "5px 0"}}>
-                //     <Card.Meta
-                //         avatar={<PauseOutlined rotate={90} />}
-                //         title={info.name}
-                //     />
-                //
-                // </Card>
             )}
         </Draggable>
 
