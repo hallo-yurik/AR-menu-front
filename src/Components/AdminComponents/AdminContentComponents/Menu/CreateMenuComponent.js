@@ -5,7 +5,7 @@ import {
     availableAlcoholSelector,
     availableDessertsSelector,
     availableHotDrinksSelector,
-    currentProductSelector,
+    currentProductSelector, isPotentialColumnSelector,
     potentialAlcoholSelector,
     potentialDessertsSelector,
     potentialDropsOpenKeys,
@@ -25,13 +25,13 @@ import {PotentialProductContainer} from "./PotentialProductContainer";
 
 const {Panel} = Collapse;
 
-export const CreateMenuComponent = (props) => {
+export const CreateMenuComponent = React.memo((props) => {
 
     const [isDragging, setDragging] = useState(false)
     const [currentProductArray, setCurrentProductArray] = useState([])
     const [addCurrentProduct, setAddCurrentProduct] = useState("")
     const [currentDropdownKey, setCurrentDropdownKey] = useState(-1)
-    const [currentDroppable, setCurrentDroppable] = useState(null)
+    const [currentDraggable, setCurrentDraggable] = useState(null)
 
     const availableDessertsArray = useSelector(availableDessertsSelector);
     const availableHotDrinksArray = useSelector(availableHotDrinksSelector);
@@ -40,6 +40,8 @@ export const CreateMenuComponent = (props) => {
     const potentialDessertsArray = useSelector(potentialDessertsSelector);
     const potentialHotDrinksArray = useSelector(potentialHotDrinksSelector);
     const potentialAlcoholArray = useSelector(potentialAlcoholSelector);
+
+    const isPotentialColumn = useSelector(isPotentialColumnSelector);
 
     const potentialDropsAreOpenKeysArray = useSelector(potentialDropsOpenKeys);
     const currentProduct = useSelector(currentProductSelector); //Desserts, HotDrinks, Alcohol
@@ -73,7 +75,7 @@ export const CreateMenuComponent = (props) => {
                 break
         }
 
-        console.log(9999)
+        // console.log(9999)
 
     }, [currentProductArray,
         addCurrentProduct,
@@ -83,30 +85,20 @@ export const CreateMenuComponent = (props) => {
         availableAlcoholArray,
         currentProduct])
 
-
-    // useEffect(() => {
-    //
-    // }, [])
-
-    // console.log(potentialDessertsArray)
-
-    // useEffect(() => {
-    //     console.log(currentDroppable)
-    //     // currentDroppable();
-    // }, [isDragging])
-
     const onSelectChange = (value, option) => {
         dispatch(adminActions.changeCurrentProduct(value))
     }
 
-    const onBeforeCapture = () => {
+    const onBeforeCapture = (result) => {
+        dispatch(adminActions.isPotentialColumn(result.draggableId))
+        setCurrentDraggable(result.draggableId)
         setDragging(true)
     }
 
     const onDragEnd = (result, currentProduct) => {
         const {destination, source, draggableId} = result;
         setDragging(false)
-        setCurrentDroppable(null);
+        setCurrentDraggable(null)
 
         if (!destination) return
         if (destination.droppableId === source.droppableId && destination.index === source.index) return;
@@ -145,6 +137,11 @@ export const CreateMenuComponent = (props) => {
         if (destination.droppableId !== source.droppableId) {
 
             if (destination.droppableId.includes("potential")) {
+
+                if (source.droppableId.includes("potential")) {
+                    return
+                }
+
                 switch (currentProduct) { //Desserts, HotDrinks, Alcohol
                     case "Desserts":
                         dispatch(adminActions.setDessert(source.index, destination.index));
@@ -162,6 +159,8 @@ export const CreateMenuComponent = (props) => {
                         console.log("????")
                         break;
                 }
+
+
             } else {
                 switch (currentProduct) { //Desserts, HotDrinks, Alcohol
                     case "Desserts":
@@ -182,16 +181,7 @@ export const CreateMenuComponent = (props) => {
                 }
             }
 
-
-            // if (result.) {
-            //
-            // }
-
-            console.log(result)
-            //TODO: change column
         }
-
-        return
     }
 
     const onDropdownChange = (keys) => {
@@ -199,16 +189,8 @@ export const CreateMenuComponent = (props) => {
     }
 
     const activeDropdowns = () => {
-        if (isDragging) return [currentDropdownKey]
+        if (isDragging && !isPotentialColumn) return [currentDropdownKey]
         return potentialDropsAreOpenKeysArray
-    }
-
-    const currentDroppableCallback = (currentDroppable) => {
-
-        // if (currentDroppable) setCurrentDroppable(currentDroppable)
-
-        // if (currentDroppable)
-        // console.log(currentDroppable)
     }
 
     return (
@@ -226,9 +208,12 @@ export const CreateMenuComponent = (props) => {
                         }}>
                             Current menu
                         </Checkbox>
+
                         <Button icon={<SaveOutlined/>} type={"primary"}>
                             Save menu
                         </Button>
+
+
                     </div>
 
                     <div>
@@ -242,7 +227,8 @@ export const CreateMenuComponent = (props) => {
                                                 ref={provided.innerRef}>
                                                 <PotentialProductContainer
                                                     productArray={potentialDessertsArray}
-                                                    currentDroppable={currentDroppableCallback}/>
+                                                    currentDraggable={currentDraggable}
+                                                />
                                                 {provided.placeholder}
                                             </div>
                                         )
@@ -256,9 +242,12 @@ export const CreateMenuComponent = (props) => {
                                             <div
                                                 {...provided.droppableProps}
                                                 ref={provided.innerRef}>
+
+
                                                 <PotentialProductContainer
                                                     productArray={potentialHotDrinksArray}
-                                                    currentDroppable={currentDroppableCallback}/>
+                                                    currentDraggable={currentDraggable}
+                                                />
                                                 {provided.placeholder}
                                             </div>
                                         )
@@ -274,7 +263,8 @@ export const CreateMenuComponent = (props) => {
                                                 ref={provided.innerRef}>
                                                 <PotentialProductContainer
                                                     productArray={potentialAlcoholArray}
-                                                    currentDroppable={currentDroppableCallback}/>
+                                                    currentDraggable={currentDraggable}
+                                                />
                                                 {provided.placeholder}
                                             </div>
                                         )
@@ -286,7 +276,7 @@ export const CreateMenuComponent = (props) => {
                 </Col>
                 <Col span={12} align={"right"}>
                     <div style={{margin: "10px 0"}}>
-                        <Select defaultValue={currentProduct} style={{width: 120, margin: "0 10px"}}
+                        <Select value={currentProduct} style={{width: 120, margin: "0 10px"}}
                                 onChange={onSelectChange}>
                             <Select.Option value="Desserts">Desserts</Select.Option>
                             <Select.Option value="HotDrinks">Hot drinks</Select.Option>
@@ -299,9 +289,9 @@ export const CreateMenuComponent = (props) => {
                     <AvailableProductsContainer
                         productArray={currentProductArray}
                         productName={currentProduct}
-                        currentDroppable={currentDroppableCallback}/>
+                        currentDraggable={currentDraggable}/>
                 </Col>
             </Row>
         </DragDropContext>
     )
-}
+})

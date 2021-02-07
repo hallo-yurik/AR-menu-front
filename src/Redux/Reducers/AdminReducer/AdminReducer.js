@@ -17,7 +17,8 @@ const CHANGE_CURRENT_CONTENT = "CHANGE_CURRENT_CONTENT";
 const CHANGE_CURRENT_PRODUCT = "CHANGE_CURRENT_PRODUCT";
 const CHANGE_POTENTIAL_DROPS_KEYS = "CHANGE_POTENTIAL_DROPS_KEYS";
 const UPDATE_LIST = "UPDATE_LIST";
-
+const FIND_CURRENT_PRODUCT = "FIND_CURRENT_PRODUCT";
+const IS_POTENTIAL_COLUMN = "IS_POTENTIAL_COLUMN";
 
 const initialState = {
     potentialDesserts: [],
@@ -29,7 +30,8 @@ const initialState = {
     currentMenuTabKey: "1",
     currentContentKey: "1",
     currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
-    potentialDropsAreOpenKeys: []
+    potentialDropsAreOpenKeys: [],
+    isPotentialColumn: false
 };
 
 const adminReducer = (state = initialState, action) => {
@@ -83,7 +85,11 @@ const adminReducer = (state = initialState, action) => {
             const newAvailableDessertsRemove = [...state.availableDesserts];
             newAvailableDessertsRemove.splice(action.destinationIndex, 0, removedDessertArrayRemove[0]);
 
-            return {...state, potentialDesserts: newPotentialDessertsRemove, availableDesserts: newAvailableDessertsRemove};
+            return {
+                ...state,
+                potentialDesserts: newPotentialDessertsRemove,
+                availableDesserts: newAvailableDessertsRemove
+            };
 
         case REMOVE_HOT_DRINK:
 
@@ -93,11 +99,13 @@ const adminReducer = (state = initialState, action) => {
             const newAvailableHotDrinksRemove = [...state.availableHotDrinks];
             newAvailableHotDrinksRemove.splice(action.destinationIndex, 0, removedHotDrinkArrayRemove[0]);
 
-            return {...state, potentialHotDrinks: newPotentialHotDrinksRemove, availableHotDrinks: newAvailableHotDrinksRemove};
+            return {
+                ...state,
+                potentialHotDrinks: newPotentialHotDrinksRemove,
+                availableHotDrinks: newAvailableHotDrinksRemove
+            };
 
         case REMOVE_ALCOHOL:
-
-            console.log("bbb")
 
             const newPotentialAlcoholRemove = [...state.potentialAlcohol]
             const removedAlcoholArrayRemove = newPotentialAlcoholRemove.splice(action.sourceIndex, 1)
@@ -132,6 +140,41 @@ const adminReducer = (state = initialState, action) => {
 
             return newState;
 
+        case FIND_CURRENT_PRODUCT:
+
+            let productName;
+
+            const dessert = state.potentialDesserts.find((el) => el._id === action.productId)
+            const hotDrinks = state.potentialHotDrinks.find((el) => el._id === action.productId)
+            const alcohol = state.potentialAlcohol.find((el) => el._id === action.productId)
+
+            //Desserts, HotDrinks, Alcohol
+            if (dessert != null) productName = "Desserts"
+            if (hotDrinks != null) productName = "HotDrinks"
+            if (alcohol != null) productName = "Alcohol"
+
+            if (dessert || hotDrinks || alcohol) {
+                return {...state, currentProductName: productName}
+            } else {
+                return state
+            }
+
+        case IS_POTENTIAL_COLUMN:
+
+            const dessertPotential = state.potentialDesserts.find((el) => el._id === action.productId)
+            const hotDrinksPotential = state.potentialHotDrinks.find((el) => el._id === action.productId)
+            const alcoholPotential = state.potentialAlcohol.find((el) => el._id === action.productId)
+
+            const dessertAvailable = state.availableDesserts.find((el) => el._id === action.productId)
+            const hotDrinksAvailable = state.availableHotDrinks.find((el) => el._id === action.productId)
+            const alcoholAvailable = state.availableAlcohol.find((el) => el._id === action.productId)
+
+
+            if (dessertPotential || hotDrinksPotential || alcoholPotential) return {...state, isPotentialColumn: true}
+            if (dessertAvailable || hotDrinksAvailable || alcoholAvailable) return {...state, isPotentialColumn: false}
+
+            return state
+
 
         default:
             return state;
@@ -158,7 +201,10 @@ export const adminActions = {
         productName,
         sourceIndex,
         destinationIndex
-    })
+    }),
+    findCurrentProduct: (productId) => ({type: FIND_CURRENT_PRODUCT, productId}),
+    isPotentialColumn: (productId) => ({type: IS_POTENTIAL_COLUMN, productId})
+
 };
 
 export const initAllProducts = () => {

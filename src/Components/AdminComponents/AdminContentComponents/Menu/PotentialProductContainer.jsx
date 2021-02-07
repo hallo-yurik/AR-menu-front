@@ -3,13 +3,13 @@ import {SingleProductCard} from "./SingleProductCard";
 
 export const PotentialProductContainer = (props) => {
 
-    const {productArray, currentDroppable} = props
+    const {productArray} = props
 
     return (
         <div>
             {productArray.map((el, index) => {
                 return (
-                    <SingleProductCard key={el._id} index={index} info={el} currentDroppable={currentDroppable}/>
+                    <SingleProductCard key={el._id} index={index} info={el}/>
                 )
             })}
         </div>

@@ -55,3 +55,8 @@ export const potentialDropsOpenKeys = createSelector(
     state => state.admin.potentialDropsAreOpenKeys,
     keys => keys
 )
+
+export const isPotentialColumnSelector = createSelector(
+    state => state.admin.isPotentialColumn,
+    keys => keys
+)
