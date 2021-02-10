@@ -6,3 +6,28 @@
     font-size: 14px;
 }
 
+.ant-list-item-meta-title {
+    font-size: 14px;
+}
+
+.ant-list-item-meta-description {
+    font-size: 18px;
+    text-align: center;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-title {
+    font-size: 20px;
+}
+
+.ant-modal-confirm-content > .ant-divider-horizontal.ant-divider-with-text {
+    font-size: 25px;
+}
+
+/*.product-properties-card-grid > .product-property-title {*/
+/*    font-weight: bold;*/
+/*    !*text-align: left;*!*/
+/*}*/
+
+/*.product-properties-card-grid > .product-property-value {*/
+/*    !*text-align: left;*!*/
+/*}*/

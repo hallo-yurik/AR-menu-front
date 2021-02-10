@@ -1,5 +1,5 @@
-import React, {useEffect, useCallback, useState} from 'react'
-import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
+import React, {useEffect, useState, useRef} from 'react'
+import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import {useDispatch, useSelector} from "react-redux";
 import {
     availableAlcoholSelector,
@@ -18,12 +18,31 @@ import {
     PlusOutlined
 } from '@ant-design/icons';
 
-import {Col, Row, Collapse, Button, Checkbox, Select} from 'antd';
+import {Col, Row, Collapse, Button, Checkbox, Select, Modal} from 'antd';
 import "../../../Styles/CreateMenuComponentStyle.css"
 import {AvailableProductsContainer} from "./AvailableProductContainer";
 import {PotentialProductContainer} from "./PotentialProductContainer";
+import {
+    adminFormsActions,
+    createMenuThunk
+} from "../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {
+    isCurrentMenuSelector,
+    isMenuSendingSelector, validateMenuErrors
+} from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
+import {CreateMenuModalComponent} from "./CreateMenuModalComponent";
 
 const {Panel} = Collapse;
+
+const validateMenuCreation = (dessertsArray, hotDrinkArray, alcoholArray) => {
+    const errors = []
+
+    if (dessertsArray instanceof Array && !dessertsArray.length) errors.push("there should be at least one dessert")
+    if (hotDrinkArray instanceof Array && !hotDrinkArray.length) errors.push("there should be at least one hot drink")
+    if (alcoholArray instanceof Array && !alcoholArray.length) errors.push("there should be at least one alcohol")
+
+    return errors
+}
 
 export const CreateMenuComponent = React.memo((props) => {
 
@@ -32,6 +51,10 @@ export const CreateMenuComponent = React.memo((props) => {
     const [addCurrentProduct, setAddCurrentProduct] = useState("")
     const [currentDropdownKey, setCurrentDropdownKey] = useState(-1)
     const [currentDraggable, setCurrentDraggable] = useState(null)
+    // const [currentModal, setCurrentModal] = useState(null)
+    const [modalVisible, setModalVisible] = useState(false)
+
+    const [modal, contextHolder] = Modal.useModal();
 
     const availableDessertsArray = useSelector(availableDessertsSelector);
     const availableHotDrinksArray = useSelector(availableHotDrinksSelector);
@@ -46,15 +69,27 @@ export const CreateMenuComponent = React.memo((props) => {
     const potentialDropsAreOpenKeysArray = useSelector(potentialDropsOpenKeys);
     const currentProduct = useSelector(currentProductSelector); //Desserts, HotDrinks, Alcohol
 
+    const isCurrentMenu = useSelector(isCurrentMenuSelector);
+    const isSendingMenu = useSelector(isMenuSendingSelector);
+    const validateMenuErrorsArray = useSelector(validateMenuErrors);
+
     const dispatch = useDispatch()
+    // const modalRef = useRef(null)
 
     useEffect(() => {
         dispatch(initAllProducts())
+
+        // setTimeout(() => {
+        //     dispatch(adminFormsActions.setIsCurrentMenu(!isCurrentMenu))
+        // }, 10000)
+
+
     }, [dispatch])
 
     useEffect(() => {
 
         switch (currentProduct) {
+
             case "Desserts":
                 setCurrentProductArray(availableDessertsArray)
                 setAddCurrentProduct("dessert")
@@ -75,8 +110,6 @@ export const CreateMenuComponent = React.memo((props) => {
                 break
         }
 
-        // console.log(9999)
-
     }, [currentProductArray,
         addCurrentProduct,
         currentDropdownKey,
@@ -84,6 +117,17 @@ export const CreateMenuComponent = React.memo((props) => {
         availableHotDrinksArray,
         availableAlcoholArray,
         currentProduct])
+
+    useEffect(() => {
+        if (validateMenuErrorsArray.length === 0) {
+            setModalVisible(false);
+        } else {
+
+            const modalElement = document.getElementsByClassName("ant-modal-wrap ant-modal-centered")[0]
+            modalElement.scrollTo({top: 0, behavior: "smooth"})
+
+        }
+    }, [dispatch, validateMenuErrorsArray])
 
     const onSelectChange = (value, option) => {
         dispatch(adminActions.changeCurrentProduct(value))
@@ -193,27 +237,119 @@ export const CreateMenuComponent = React.memo((props) => {
         return potentialDropsAreOpenKeysArray
     }
 
+    const onCheckboxChange = event => dispatch(adminFormsActions.setIsCurrentMenu(event.target.checked))
+
+    const postMenu = () => {
+
+        const dessertsIdsArray = potentialDessertsArray.map((el) => el._id)
+        const hotDrinksIdsArray = potentialHotDrinksArray.map((el) => el._id)
+        const alcoholIdsArray = potentialAlcoholArray.map((el) => el._id)
+
+        dispatch(createMenuThunk(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrentMenu))
+
+    }
+
+    const onSaveButton = () => {
+
+        const dessertsIdsArray = potentialDessertsArray.map((el) => el._id)
+        const hotDrinksIdsArray = potentialHotDrinksArray.map((el) => el._id)
+        const alcoholIdsArray = potentialAlcoholArray.map((el) => el._id)
+
+        const errors = validateMenuCreation(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray)
+
+        if (errors.length) {
+            modal.error({
+                title: 'Empty section',
+                content: (
+                    errors.map((error) => (<div>{error}</div>))
+                ),
+                centered: true
+            })
+
+        } else {
+
+            setModalVisible(true);
+
+
+            // console.log(isSendingMenu)
+
+            // setCurrentModal(
+            // <Modal title={`New menu${isCurrentMenu ? " (current)" : ""}`}
+            //        centered={true}
+            //        width={"50%"}
+            //        onOk={(close) => postMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrentMenu, close)}
+            //        onCancel={(close) => {
+            //            setCurrentModal(null)
+            //            close()
+            //        }}
+            //
+            // >
+            //     <CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
+            //                               potentialHotDrinksArray={potentialHotDrinksArray}
+            //                               potentialAlcoholArray={potentialAlcoholArray}/>
+            // </Modal>
+
+            // modal.
+
+            // modal.confirm({
+            //     title: `New menu${isCurrentMenu ? " (current)" : ""}`,
+            //     centered: true,
+            //     width: "50%",
+            //     onOk: (close) => postMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrentMenu, close),
+            //     onCancel: (close) => {
+            //         setCurrentModal(null)
+            //         close()
+            //     },
+            //     content: (<CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
+            //                                         potentialHotDrinksArray={potentialHotDrinksArray}
+            //                                         potentialAlcoholArray={potentialAlcoholArray}/>),
+            //     confirmLoading: isSendingMenu
+            // })
+            // )
+        }
+    }
+
     return (
+
 
         <DragDropContext
             onDragEnd={(result) => onDragEnd(result, currentProduct)}
             onBeforeCapture={onBeforeCapture}
         >
             <Row gutter={[16, 0]}>
+
                 <Col span={12} align={"right"}>
 
                     <div style={{margin: "10px 0"}}>
-                        <Checkbox style={{margin: "0 10px"}} onChange={() => {
-                            //TODO
-                        }}>
+                        <Checkbox style={{margin: "0 10px"}} onChange={onCheckboxChange}>
                             Current menu
                         </Checkbox>
 
-                        <Button icon={<SaveOutlined/>} type={"primary"}>
+                        <Button icon={<SaveOutlined/>} type={"primary"}
+                                onClick={onSaveButton}>
                             Save menu
                         </Button>
-
-
+                        <Modal visible={modalVisible}
+                               title={`New menu${isCurrentMenu ? " (current)" : ""}`}
+                               centered={true}
+                               width={"50%"}
+                               onOk={postMenu}
+                               onCancel={() => {
+                                   dispatch(adminFormsActions.clearErrors())
+                                   setModalVisible(false)
+                               }}
+                               confirmLoading={isSendingMenu}
+                               closable={false}
+                               maskClosable={false}
+                               // ref={modalRef}
+                        >
+                            <CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
+                                                      potentialHotDrinksArray={potentialHotDrinksArray}
+                                                      potentialAlcoholArray={potentialAlcoholArray}
+                                                      errors={validateMenuErrorsArray}
+                            />
+                        </Modal>
+                        {contextHolder}
                     </div>
 
                     <div>

@@ -175,7 +175,6 @@ const adminReducer = (state = initialState, action) => {
 
             return state
 
-
         default:
             return state;
     }
@@ -211,13 +210,13 @@ export const initAllProducts = () => {
     return async dispatch => {
         try {
             const desserts = await adminAPI.getProductGroup("desserts");
-            dispatch(adminActions.initDesserts(desserts.desserts));
+            dispatch(adminActions.initDesserts(desserts.data.desserts));
 
             const hotDrinks = await adminAPI.getProductGroup("hot-drinks");
-            dispatch(adminActions.initHotDrinks(hotDrinks.hotDrinks));
+            dispatch(adminActions.initHotDrinks(hotDrinks.data.hotDrinks));
 
             const alcohol = await adminAPI.getProductGroup("alcohol");
-            dispatch(adminActions.initAlcohol(alcohol.alcohol));
+            dispatch(adminActions.initAlcohol(alcohol.data.alcohol));
         } catch (err) {
             console.log(err)
         }

@@ -38,7 +38,8 @@ export const availableAlcoholSelector = createSelector(
 
 export const currentMenuItemKeySelector = createSelector(
     state => state.admin.currentMenuTabKey,
-    key => key
+    key => key,
+    (key, _) => key
 )
 
 export const currentContentSelector = createSelector(

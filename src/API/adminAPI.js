@@ -1,11 +1,28 @@
 import {APIInstance} from "./adminServerUrl";
 
 export const adminAPI = {
+
+    async createMenu(dessertsIds, hotDrinksIds, alcoholIds, current = false) {
+        try {
+
+            return await APIInstance.post(`/admin/menu`, {
+                desserts: dessertsIds,
+                hotDrinks: hotDrinksIds,
+                alcohol: alcoholIds,
+                current: current
+
+            })
+
+        } catch (err) {
+            console.log(err)
+        }
+    },
+
+
     async getProductGroup(groupName) {
 
         try {
-            const response = await APIInstance.get(`/${groupName}`);
-            return response.data;
+            return await APIInstance.get(`/admin/${groupName}`);
         } catch (err) {
             console.log(err)
         }
@@ -15,16 +32,13 @@ export const adminAPI = {
     async createProduct(groupName, data) {
         try {
             if (groupName === "desserts") {
-                const response = await APIInstance.post(`/${groupName}`, {
-                    headers: {'content-type': 'application/x-www-form-urlencoded'},
-                    data
+                const response = await APIInstance.post(`/admin/${groupName}`, {...data}, {
+                    headers: {'content-type': 'multipart/from-data'},
                 })
                 return response.data
             }
 
-            const response = await APIInstance.post(`/${groupName}`, {
-                data
-            })
+            const response = await APIInstance.post(`/admin/${groupName}`, {...data})
             return response.data
         } catch (err) {
             console.log(err)
@@ -34,16 +48,13 @@ export const adminAPI = {
     async changeProduct(groupName, id, data) {
         try {
             if (groupName === "desserts") {
-                const response = await APIInstance.patch(`/${groupName}/${id}`, {
+                const response = await APIInstance.patch(`/admin/${groupName}/${id}`, {...data}, {
                     headers: {'content-type': 'multipart/form-data'},
-                    data
                 })
                 return response.data
             }
 
-            const response = await APIInstance.patch(`/${groupName}/${id}`, {
-                data
-            })
+            const response = await APIInstance.patch(`/admin/${groupName}/${id}`, {...data})
             return response.data
         } catch (err) {
             console.log(err)
@@ -52,7 +63,7 @@ export const adminAPI = {
 
     async deleteProduct(groupName, id) {
         try {
-            const response = await APIInstance.delete(`/${groupName}/${id}`)
+            const response = await APIInstance.delete(`/admin/${groupName}/${id}`)
             return response.data
         } catch (err) {
             console.log(err)
