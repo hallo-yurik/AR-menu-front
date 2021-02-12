@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -30,7 +30,8 @@ import {
     isCurrentMenuSelector,
     isMenuSendingSelector, validateMenuErrors
 } from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
-import {CreateMenuModalComponent} from "./CreateMenuModalComponent";
+import {CreateMenuModalComponent} from "./Modals/CreateMenuModalComponent";
+import {CreateDessertModal} from "./Modals/CreateDessertModal";
 
 const {Panel} = Collapse;
 
@@ -53,6 +54,7 @@ export const CreateMenuComponent = React.memo((props) => {
     const [currentDraggable, setCurrentDraggable] = useState(null)
     // const [currentModal, setCurrentModal] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
+    const [createMenuModalVisible, setCreateMenuModalVisible] = useState(false)
 
     const [modal, contextHolder] = Modal.useModal();
 
@@ -83,6 +85,7 @@ export const CreateMenuComponent = React.memo((props) => {
         //     dispatch(adminFormsActions.setIsCurrentMenu(!isCurrentMenu))
         // }, 10000)
 
+        return dispatch(adminActions.refreshMenuCreator())
 
     }, [dispatch])
 
@@ -267,46 +270,16 @@ export const CreateMenuComponent = React.memo((props) => {
             })
 
         } else {
-
             setModalVisible(true);
-
-
-            // console.log(isSendingMenu)
-
-            // setCurrentModal(
-            // <Modal title={`New menu${isCurrentMenu ? " (current)" : ""}`}
-            //        centered={true}
-            //        width={"50%"}
-            //        onOk={(close) => postMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrentMenu, close)}
-            //        onCancel={(close) => {
-            //            setCurrentModal(null)
-            //            close()
-            //        }}
-            //
-            // >
-            //     <CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
-            //                               potentialHotDrinksArray={potentialHotDrinksArray}
-            //                               potentialAlcoholArray={potentialAlcoholArray}/>
-            // </Modal>
-
-            // modal.
-
-            // modal.confirm({
-            //     title: `New menu${isCurrentMenu ? " (current)" : ""}`,
-            //     centered: true,
-            //     width: "50%",
-            //     onOk: (close) => postMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrentMenu, close),
-            //     onCancel: (close) => {
-            //         setCurrentModal(null)
-            //         close()
-            //     },
-            //     content: (<CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
-            //                                         potentialHotDrinksArray={potentialHotDrinksArray}
-            //                                         potentialAlcoholArray={potentialAlcoholArray}/>),
-            //     confirmLoading: isSendingMenu
-            // })
-            // )
         }
+    }
+
+    const createNewProduct = () => {
+
+    }
+
+    const closeCreateMenuModal = () => {
+        setCreateMenuModalVisible(false)
     }
 
     return (
@@ -341,7 +314,7 @@ export const CreateMenuComponent = React.memo((props) => {
                                confirmLoading={isSendingMenu}
                                closable={false}
                                maskClosable={false}
-                               // ref={modalRef}
+                            // ref={modalRef}
                         >
                             <CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
                                                       potentialHotDrinksArray={potentialHotDrinksArray}
@@ -418,9 +391,10 @@ export const CreateMenuComponent = React.memo((props) => {
                             <Select.Option value="HotDrinks">Hot drinks</Select.Option>
                             <Select.Option value="Alcohol">Alcohol</Select.Option>
                         </Select>
-                        <Button icon={<PlusOutlined/>} type={"primary"}>
+                        <Button icon={<PlusOutlined/>} type={"primary"} onClick={closeCreateMenuModal}>
                             Add {addCurrentProduct}
                         </Button>
+                        <CreateDessertModal isVisible={createMenuModalVisible} onClose={setCreateMenuModalVisible}/>
                     </div>
                     <AvailableProductsContainer
                         productArray={currentProductArray}

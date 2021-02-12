@@ -1,6 +1,6 @@
 import React from 'react'
 import {Card, Divider, List, Typography} from "antd";
-import "../../../Styles/CreateMenuComponentStyle.css"
+import "../../../../Styles/CreateMenuComponentStyle.css"
 
 export const CreateMenuModalComponent = (props) => {
 

@@ -19,6 +19,7 @@ const CHANGE_POTENTIAL_DROPS_KEYS = "CHANGE_POTENTIAL_DROPS_KEYS";
 const UPDATE_LIST = "UPDATE_LIST";
 const FIND_CURRENT_PRODUCT = "FIND_CURRENT_PRODUCT";
 const IS_POTENTIAL_COLUMN = "IS_POTENTIAL_COLUMN";
+const REFRESH_MENU_CREATOR = "REFRESH_MENU_CREATOR";
 
 const initialState = {
     potentialDesserts: [],
@@ -175,6 +176,22 @@ const adminReducer = (state = initialState, action) => {
 
             return state
 
+        case REFRESH_MENU_CREATOR:
+
+            return {...state,
+                potentialDesserts: [],
+                potentialHotDrinks: [],
+                potentialAlcohol: [],
+                availableDesserts: [],
+                availableHotDrinks: [],
+                availableAlcohol: [],
+                currentMenuTabKey: "1",
+                currentContentKey: "1",
+                currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
+                potentialDropsAreOpenKeys: [],
+                isPotentialColumn: false
+            }
+
         default:
             return state;
     }
@@ -202,7 +219,8 @@ export const adminActions = {
         destinationIndex
     }),
     findCurrentProduct: (productId) => ({type: FIND_CURRENT_PRODUCT, productId}),
-    isPotentialColumn: (productId) => ({type: IS_POTENTIAL_COLUMN, productId})
+    isPotentialColumn: (productId) => ({type: IS_POTENTIAL_COLUMN, productId}),
+    refreshMenuCreator: () => ({type: REFRESH_MENU_CREATOR})
 
 };
 
