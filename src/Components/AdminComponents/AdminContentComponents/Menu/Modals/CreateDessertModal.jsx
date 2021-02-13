@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import {Button, Form, Input, Modal, Upload} from "antd";
+import {Button, Form, Image, Input, message, Modal, Upload} from "antd";
 import {useDispatch} from "react-redux";
 import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
 import {adminFormsActions} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
 import "../../../../Styles/CreateDessertModalStyle.css"
+import ImgCrop from "antd-img-crop";
 
 const combineFormData = () => {
     return
@@ -35,10 +36,37 @@ export const CreateDessertModal = (props) => {
     const dispatch = useDispatch()
     const [form] = Form.useForm();
     const [imageFileType, setImageFileType] = useState(null)
+    const [dessertImage, setDessertImage] = useState([])
+    const [imagePreviewVisible, setImagePreviewVisible] = useState(false)
+    const [dessertModel, setDessertModel] = useState([])
 
     useEffect(() => {
-        return setImageFileType(null)
+        return () => setImageFileType(null)
     }, [])
+
+    useEffect(() => {
+        if (dessertData) {
+            setDessertImage([{
+                uid: dessertData._id,
+                name: dessertData.name,
+                url: dessertData.image,
+                status: "done"
+            }])
+
+            setDessertModel([{
+                uid: dessertData._id,
+                name: dessertData.name,
+                url: dessertData.ar,
+                status: "done"
+            }])
+        }
+        return () => {
+            setDessertImage([])
+            setDessertModel([])
+        }
+    }, [dessertData])
+
+    // useEffect()
 
 
     const onFormSubmit = async () => {
@@ -64,10 +92,40 @@ export const CreateDessertModal = (props) => {
         // return e && e.fileList;
     };
 
+
+    const onChange = ({file, fileList: newFileList}) => {
+        if (newFileList.length) {
+            newFileList[0].status = "done"
+            setImageFileType(file.type)
+        }
+        setDessertImage(newFileList);
+    };
+
+    const onModelChange = ({file, fileList: newFileList, event}) => {
+        if (newFileList.length) {
+            newFileList[0].status = "done"
+        }
+        setDessertModel(newFileList);
+    }
+
+    const onPreview = async file => {
+        let src = file.url;
+        if (!src) {
+            src = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+
+        setDessertImage([{...dessertImage[0], url: src}])
+        setImagePreviewVisible(true)
+    };
+
     return (
         <>
             <Modal
-                visible={true}
+                visible={true}///
                 title={dessertData ? dessertData.name : "New dessert"}
                 centered={true}
                 width={"50%"}
@@ -155,30 +213,107 @@ export const CreateDessertModal = (props) => {
                         name={"dessert_image"}
                         label={"Image"}
                         valuePropName={"fileList"}
-                        getValueFromEvent={normFile}
+                        getValueFromEvent={(e) => {
+                            console.log(e)
+                        }}
                         required={true}
                         colon={false}
-                        rules={[{validator: () => {
-                            if (imageFileType == null) return Promise.reject(new Error('Please add dessert\'s image.'));
-                            if (imageFileType !== "image/png") return Promise.reject(new Error("File should be in png format"));
-                            }}]}
+                        rules={[{
+                            validator: (a, b) => {
+                                if (!dessertImage.length) return Promise.reject(new Error('Please add dessert\'s image.'));
+                                if (imageFileType !== "image/png") return Promise.reject(new Error("File should be in png format"));
+                            }
+                        }]}
+                        // validateTrigger={['onChange', 'onBlur']}
                         {...formItemLayout}>
+
+                        <ImgCrop>
+                            <Upload
+                                name={"dessert_image"}
+                                listType="picture-card"
+                                fileList={dessertImage}
+                                onChange={onChange}
+                                onPreview={onPreview}
+                            >
+                                {dessertImage.length === 0 && "Upload image"}
+                            </Upload>
+                        </ImgCrop>
+                    </Form.Item>
+                    <Modal
+                        visible={imagePreviewVisible}
+                        title={!!form.getFieldValue("name") || "New dessert"}
+                        centered={true}
+                        width={"75%"}
+                        onCancel={() => {
+                            setImagePreviewVisible(false)
+                        }}
+                        closable
+                        maskClosable
+                        footer={null}
+                    >
+                        <Image
+                            alt={!!form.getFieldValue("name") || "New dessert"}
+                            width={"100%"}
+                            src={dessertImage[0] && dessertImage[0].url ? dessertImage[0].url : null}
+                            preview={false}
+                        />
+                    </Modal>
+
+                    <Form.Item
+                        name={"dessert_model"}
+                        label={"Model"}
+                        valuePropName={"fileList"}
+                        getValueFromEvent={(e) => {
+                            console.log(e)
+                        }}
+                        required={true}
+                        colon={false}
+                        rules={[
+
+                            {
+                                validator: (a, b) => {
+
+                                    if (!dessertModel.length) return Promise.reject(new Error('Please add dessert\'s model.'));
+                                    const extension = dessertModel[0].name.slice((Math.max(0, dessertModel[0].name.lastIndexOf(".")) || Infinity) + 1)
+                                    if (extension !== "usdz") return Promise.reject(new Error("File should be in usdz format"));
+                                }
+                            }
+
+                        ]}
+                        // rules={[{
+                        //     validator: (a, b) => {
+                        //         // console.log(a, b)
+                        //         console.log(dessertModel[0].name)
+                        //         if (!dessertModel.length) return Promise.reject(new Error('Please add dessert\'s model.'));
+                        //
+                        //         // console.log(dessertModel[0])
+                        //         // if (dessertModel[0] !== "image/png") return Promise.reject(new Error("File should be in usdz format"));
+                        //     }
+                        // }]}
+                        // validateTrigger={['onChange', 'onBlur']}
+                        {...formItemLayout}>
+
                         <Upload
-                            name={"image"}
-                            beforeUpload={file => {
-
-                                setImageFileType(file.type)
-
-                                // if (file.type !== 'image/png') {
-                                //     // message.error(`${file.name} is not a png file`);
-                                // }
-                                // console.log(file)
-                                return false
-                            }}
+                            listType="picture"
                             maxCount={1}
+                            onChange={onModelChange}
+                            fileList={dessertModel}
                         >
-                            <Button icon={<UploadOutlined/>}>Upload png image</Button>
+                            <Button icon={<UploadOutlined/>}>Upload USDZ model</Button>
                         </Upload>
+
+                        {/*<ImgCrop>*/}
+                        {/*    <Upload*/}
+                        {/*        name={"dessert_model"}*/}
+                        {/*        listType="picture"*/}
+                        {/*        // fileList={dessertImage}*/}
+                        {/*        // onChange={onChange}*/}
+                        {/*        // onPreview={onPreview}*/}
+                        {/*    >*/}
+                        {/*        Lol*/}
+                        {/*        /!*{dessertImage.length === 0 && "Upload image"}*!/*/}
+                        {/*    </Upload>*/}
+                        {/*</ImgCrop>*/}
                     </Form.Item>
                 </Form>
 
