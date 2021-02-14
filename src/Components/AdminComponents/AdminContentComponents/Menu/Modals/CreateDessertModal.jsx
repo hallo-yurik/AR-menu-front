@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react'
-import {Button, Form, Image, Input, message, Modal, Upload} from "antd";
-import {useDispatch} from "react-redux";
+import {Button, Divider, Form, Image, Input, InputNumber, List, message, Modal, Typography, Upload} from "antd";
+import {useDispatch, useSelector} from "react-redux";
 import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
-import {adminFormsActions} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {adminFormsActions, postDessertThunk} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
 import "../../../../Styles/CreateDessertModalStyle.css"
 import ImgCrop from "antd-img-crop";
-
-const combineFormData = () => {
-    return
-}
+import {
+    isDessertSendingSelector,
+    validateDessertErrors
+} from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
 
 const formItemLayout = {
     labelCol: {
@@ -20,6 +20,7 @@ const formItemLayout = {
         sm: {span: 20},
     },
 };
+
 const formItemLayoutWithOutLabel = {
     wrapperCol: {
         xs: {span: 24, offset: 0},
@@ -29,9 +30,12 @@ const formItemLayoutWithOutLabel = {
 
 export const CreateDessertModal = (props) => {
 
-    const {isVisible, onClose, dessertData} = props
+    const {isVisible, closeModal, dessertData, clearForm} = props
 
-    const isSendingDessert = false; //selector
+    const dessertErrors = useSelector(validateDessertErrors);
+    const isSendingDessert = useSelector(isDessertSendingSelector);
+
+    // const isSendingDessert = false; //selector
 
     const dispatch = useDispatch()
     const [form] = Form.useForm();
@@ -40,9 +44,13 @@ export const CreateDessertModal = (props) => {
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false)
     const [dessertModel, setDessertModel] = useState([])
 
-    useEffect(() => {
-        return () => setImageFileType(null)
-    }, [])
+    // useEffect(() => {
+    //     return () => {
+    //         setImageFileType(null)
+    //         dispatch(adminFormsActions.clearErrors())
+    //     }
+    // }, [dispatch])
+
 
     useEffect(() => {
         if (dessertData) {
@@ -66,14 +74,36 @@ export const CreateDessertModal = (props) => {
         }
     }, [dessertData])
 
-    // useEffect()
 
+    useEffect(() => {
+        if (!isVisible) {
+            form.resetFields()
+            setDessertModel([])
+            setDessertImage([])
+        }
+
+    }, [form, isVisible, isSendingDessert, dessertErrors])
+
+    // useEffect(() => {
+    //     setImageFileType(null)
+    //     dispatch(adminFormsActions.clearErrors())
+    // }, [isVisible])
+
+    useEffect(() => {
+        if (clearForm) {
+            form.resetFields()
+            setDessertModel([])
+            setDessertImage([])
+        }
+    }, [clearForm, form])
 
     const onFormSubmit = async () => {
 
         try {
             const result = await form.validateFields()
-            console.log(result)
+            await combineFormData(result, dessertImage[0], dessertModel[0])
+
+
         } catch (err) {
             console.log(err)
         }
@@ -82,18 +112,68 @@ export const CreateDessertModal = (props) => {
         // result
     }
 
-    const normFile = (e) => {
-        console.log('Upload event:', e);
-        //
-        // if (Array.isArray(e)) {
-        //     return e;
-        // }
-        //
-        // return e && e.fileList;
-    };
+    const combineFormData = async (result, dessertImage, dessertModel) => {
+        try {
+
+            // console.log(dessertImage, dessertModel)
+
+            const dessertFormData = new FormData()
+            dessertFormData.set("name", result.name);
+            dessertFormData.set("ingredients", result.ingredients);
+            dessertFormData.set("price", result.price);
+            dessertFormData.set("dessert_image", dessertImage.originFileObj, dessertImage.name);
+            dessertFormData.set("dessert_model", dessertModel.originFileObj, dessertModel.name);
+
+            dispatch(postDessertThunk(dessertFormData))
+
+            // name: type: text, format: String
+            // ingredients: [type: text, format: String]
+            // price: type: text, format: Number
+            // dessert_image: type: file, format: png
+            // dessert_model: type: file, format: usdz
 
 
-    const onChange = ({file, fileList: newFileList}) => {
+            // console.log(dessertImage)
+            // console.log(dessertModel)
+            // const usdz = await new Promise(resolve => {
+            //     const reader = new FileReader();
+            //     reader.readAsDataURL(dessertModel.originFileObj);
+            //     reader.onload = () => resolve(reader.result);
+            // });
+            //
+            // const image = await new Promise(resolve => {
+            //     const reader = new FileReader();
+            //     reader.readAsDataURL(dessertImage.originFileObj);
+            //     reader.onload = () => resolve(reader.result);
+            // });
+
+            // console.log(dessertModel instanceof FileList)
+        } catch (err) {
+            console.log(err)
+        }
+
+
+        //
+        // const request = new FormData()
+        // request.set();
+        // return
+    }
+
+
+    // const normFile = (e) => {
+    //
+    //
+    //     console.log('Upload event:', e);
+    //
+    //     // if (Array.isArray(e)) {
+    //     //     return e;
+    //     // }
+    //     //
+    //     // return e && e.fileList;
+    // };
+
+
+    const onChange = async ({file, fileList: newFileList}) => {
         if (newFileList.length) {
             newFileList[0].status = "done"
             setImageFileType(file.type)
@@ -101,7 +181,7 @@ export const CreateDessertModal = (props) => {
         setDessertImage(newFileList);
     };
 
-    const onModelChange = ({file, fileList: newFileList, event}) => {
+    const onModelChange = async ({file, fileList: newFileList, event}) => {
         if (newFileList.length) {
             newFileList[0].status = "done"
         }
@@ -109,6 +189,7 @@ export const CreateDessertModal = (props) => {
     }
 
     const onPreview = async file => {
+        console.log(file)
         let src = file.url;
         if (!src) {
             src = await new Promise(resolve => {
@@ -125,16 +206,35 @@ export const CreateDessertModal = (props) => {
     return (
         <>
             <Modal
-                visible={true}///
+                visible={isVisible}
                 title={dessertData ? dessertData.name : "New dessert"}
                 centered={true}
                 width={"50%"}
                 onOk={onFormSubmit}
-                onCancel={onClose}
+                onCancel={() => {
+                    dispatch(adminFormsActions.clearErrors())
+                    closeModal()
+                }}
                 confirmLoading={isSendingDessert}
                 closable
                 maskClosable
             >
+
+                {dessertErrors.length !== 0 && dessertErrors.length !== null
+                    ? <List.Item>
+                        <List.Item.Meta
+                            title={<Divider><Typography.Text type="danger">
+                                {dessertData ? "Dessert can't be changed" : "Dessert can't be created"}
+                            </Typography.Text></Divider>}
+                            description={
+                                dessertErrors.map((error) => <div>
+                                    <Typography.Text type="danger" strong={true}>{error}</Typography.Text>
+                                </div>)
+                            }
+                        />
+                    </List.Item>
+                    : null
+                }
 
                 <Form form={form} name="dessert" {...formItemLayoutWithOutLabel}>
                     <Form.Item name="name"
@@ -208,6 +308,16 @@ export const CreateDessertModal = (props) => {
                             </>
                         )}
                     </Form.List>
+                    <Form.Item name="price"
+                               label="Price"
+                               rules={[{required: true, message: "Please input dessert's price."}]}
+                               initialValue={dessertData ? dessertData.price : 1}
+                               colon={false}
+
+                               validateTrigger={['onChange', 'onBlur']}
+                               {...formItemLayout}>
+                        <InputNumber min={1}/>
+                    </Form.Item>
 
                     <Form.Item
                         name={"dessert_image"}
@@ -222,6 +332,7 @@ export const CreateDessertModal = (props) => {
                             validator: (a, b) => {
                                 if (!dessertImage.length) return Promise.reject(new Error('Please add dessert\'s image.'));
                                 if (imageFileType !== "image/png") return Promise.reject(new Error("File should be in png format"));
+                                return Promise.resolve()
                             }
                         }]}
                         // validateTrigger={['onChange', 'onBlur']}
@@ -264,7 +375,9 @@ export const CreateDessertModal = (props) => {
                         label={"Model"}
                         valuePropName={"fileList"}
                         getValueFromEvent={(e) => {
-                            console.log(e)
+
+
+                            // console.log(e)
                         }}
                         required={true}
                         colon={false}
@@ -276,21 +389,12 @@ export const CreateDessertModal = (props) => {
                                     if (!dessertModel.length) return Promise.reject(new Error('Please add dessert\'s model.'));
                                     const extension = dessertModel[0].name.slice((Math.max(0, dessertModel[0].name.lastIndexOf(".")) || Infinity) + 1)
                                     if (extension !== "usdz") return Promise.reject(new Error("File should be in usdz format"));
+
+                                    return Promise.resolve()
                                 }
                             }
 
                         ]}
-                        // rules={[{
-                        //     validator: (a, b) => {
-                        //         // console.log(a, b)
-                        //         console.log(dessertModel[0].name)
-                        //         if (!dessertModel.length) return Promise.reject(new Error('Please add dessert\'s model.'));
-                        //
-                        //         // console.log(dessertModel[0])
-                        //         // if (dessertModel[0] !== "image/png") return Promise.reject(new Error("File should be in usdz format"));
-                        //     }
-                        // }]}
-                        // validateTrigger={['onChange', 'onBlur']}
                         {...formItemLayout}>
 
                         <Upload
@@ -301,19 +405,6 @@ export const CreateDessertModal = (props) => {
                         >
                             <Button icon={<UploadOutlined/>}>Upload USDZ model</Button>
                         </Upload>
-
-                        {/*<ImgCrop>*/}
-                        {/*    <Upload*/}
-                        {/*        name={"dessert_model"}*/}
-                        {/*        listType="picture"*/}
-                        {/*        // fileList={dessertImage}*/}
-                        {/*        // onChange={onChange}*/}
-                        {/*        // onPreview={onPreview}*/}
-                        {/*    >*/}
-                        {/*        Lol*/}
-                        {/*        /!*{dessertImage.length === 0 && "Upload image"}*!/*/}
-                        {/*    </Upload>*/}
-                        {/*</ImgCrop>*/}
                     </Form.Item>
                 </Form>
 

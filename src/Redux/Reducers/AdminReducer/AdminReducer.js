@@ -2,6 +2,7 @@ import {adminAPI} from "../../../API/adminAPI";
 import {APIInstance} from "../../../API/adminServerUrl";
 import axios from "axios";
 import {bindActionCreators} from "redux";
+import {act} from "@testing-library/react";
 
 const INIT_DESSERTS = "INIT_DESSERTS";
 const INIT_HOT_DRINKS = "INIT_HOT_DRINKS";
@@ -20,6 +21,7 @@ const UPDATE_LIST = "UPDATE_LIST";
 const FIND_CURRENT_PRODUCT = "FIND_CURRENT_PRODUCT";
 const IS_POTENTIAL_COLUMN = "IS_POTENTIAL_COLUMN";
 const REFRESH_MENU_CREATOR = "REFRESH_MENU_CREATOR";
+const ADD_PRODUCT = "ADD_PRODUCT";
 
 const initialState = {
     potentialDesserts: [],
@@ -178,7 +180,8 @@ const adminReducer = (state = initialState, action) => {
 
         case REFRESH_MENU_CREATOR:
 
-            return {...state,
+            return {
+                ...state,
                 potentialDesserts: [],
                 potentialHotDrinks: [],
                 potentialAlcohol: [],
@@ -191,7 +194,21 @@ const adminReducer = (state = initialState, action) => {
                 potentialDropsAreOpenKeys: [],
                 isPotentialColumn: false
             }
+        case ADD_PRODUCT:
+            //Desserts, HotDrinks, Alcohol
+            if (action.productName === "Desserts") {
+                return {...state, availableDesserts: [...state.availableDesserts, action.product]}
+            }
 
+            if (action.productName === "HotDrinks") {
+                return {...state, availableHotDrinks: [...state.availableHotDrinks, action.product]}
+            }
+
+            if (action.productName === "Alcohol") {
+                return {...state, availableAlcohol: [...state.availableAlcohol, action.product]}
+            }
+
+            return state
         default:
             return state;
     }
@@ -220,7 +237,8 @@ export const adminActions = {
     }),
     findCurrentProduct: (productId) => ({type: FIND_CURRENT_PRODUCT, productId}),
     isPotentialColumn: (productId) => ({type: IS_POTENTIAL_COLUMN, productId}),
-    refreshMenuCreator: () => ({type: REFRESH_MENU_CREATOR})
+    refreshMenuCreator: () => ({type: REFRESH_MENU_CREATOR}),
+    addProduct: (productName, product) => ({type: ADD_PRODUCT, productName, product})
 
 };
 
@@ -240,6 +258,49 @@ export const initAllProducts = () => {
         }
     }
 }
+
+// export const addProductThunk = (product, id) => {
+//     return async dispatch => {
+//         try {
+//
+//
+//             //Desserts, HotDrinks, Alcohol
+//             if (product === "Desserts") {
+//                 const dessert = await adminAPI.getProduct("desserts", id);
+//
+//                 console.log(dessert)
+//                 // dispatch(adminActions.addProduct(desserts))
+//                 // dispatch(adminActions.initDesserts(desserts.data.desserts));
+//             }
+//
+//             if (product === "HotDrinks") {
+//                 const hotDrink = await adminAPI.getProduct("hot-drinks", id);
+//                 console.log(hotDrink)
+//                 // dispatch(adminActions.initHotDrinks(hotDrinks.data.hotDrinks));
+//             }
+//
+//             if (product === "Alcohol") {
+//                 const alcohol = await adminAPI.getProduct("alcohol", id);
+//                 // dispatch(adminActions.initAlcohol(alcohol.data.alcohol));
+//                 console.log(alcohol)
+//             }
+//
+//
+//             // const product
+//
+//             // const desserts = await adminAPI.getProductGroup("desserts");
+//             // dispatch(adminActions.initDesserts(desserts.data.desserts));
+//             //
+//             // const hotDrinks = await adminAPI.getProductGroup("hot-drinks");
+//             // dispatch(adminActions.initHotDrinks(hotDrinks.data.hotDrinks));
+//             //
+//             // const alcohol = await adminAPI.getProductGroup("alcohol");
+//             // dispatch(adminActions.initAlcohol(alcohol.data.alcohol));
+//         } catch (err) {
+//             console.log(err)
+//         }
+//     }
+// }
 
 export const changeMenuTab = (itemKey) => {
     return dispatch => {

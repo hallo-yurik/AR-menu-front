@@ -32,6 +32,7 @@ import {
 } from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
 import {CreateMenuModalComponent} from "./Modals/CreateMenuModalComponent";
 import {CreateDessertModal} from "./Modals/CreateDessertModal";
+import {AddCurrentProductModalManager} from "./AddCurrentProductModalManager";
 
 const {Panel} = Collapse;
 
@@ -54,7 +55,9 @@ export const CreateMenuComponent = React.memo((props) => {
     const [currentDraggable, setCurrentDraggable] = useState(null)
     // const [currentModal, setCurrentModal] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
-    const [createMenuModalVisible, setCreateMenuModalVisible] = useState(false)
+
+
+    const [createProductModalVisible, setCreateProductModalVisible] = useState(false)
 
     const [modal, contextHolder] = Modal.useModal();
 
@@ -274,12 +277,16 @@ export const CreateMenuComponent = React.memo((props) => {
         }
     }
 
-    const createNewProduct = () => {
+    // const createNewProduct = () => {
+    //
+    // }
 
+    const openCreateProductModal = () => {
+        setCreateProductModalVisible(true)
     }
 
-    const closeCreateMenuModal = () => {
-        setCreateMenuModalVisible(false)
+    const closeCreateProductModal = () => {
+        setCreateProductModalVisible(false)
     }
 
     return (
@@ -391,10 +398,16 @@ export const CreateMenuComponent = React.memo((props) => {
                             <Select.Option value="HotDrinks">Hot drinks</Select.Option>
                             <Select.Option value="Alcohol">Alcohol</Select.Option>
                         </Select>
-                        <Button icon={<PlusOutlined/>} type={"primary"} onClick={closeCreateMenuModal}>
+                        <Button icon={<PlusOutlined/>} type={"primary"} onClick={openCreateProductModal}>
                             Add {addCurrentProduct}
                         </Button>
-                        <CreateDessertModal isVisible={createMenuModalVisible} onClose={setCreateMenuModalVisible}/>
+
+                        <AddCurrentProductModalManager
+                            product={currentProduct}
+                            isVisible={createProductModalVisible}
+                            onCancel={closeCreateProductModal}/>
+
+                        {/*<CreateDessertModal isVisible={createMenuModalVisible} onClose={setCreateMenuModalVisible}/>*/}
                     </div>
                     <AvailableProductsContainer
                         productArray={currentProductArray}

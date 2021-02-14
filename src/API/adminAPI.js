@@ -29,17 +29,27 @@ export const adminAPI = {
 
     },
 
+    async getProduct(groupName, id) {
+
+        try {
+            return await APIInstance.get(`/admin/${groupName}/${id}`);
+        } catch (err) {
+            console.log(err)
+        }
+
+    },
+
     async createProduct(groupName, data) {
         try {
             if (groupName === "desserts") {
-                const response = await APIInstance.post(`/admin/${groupName}`, {...data}, {
+
+                return await APIInstance.post(`/admin/${groupName}`, data, {
                     headers: {'content-type': 'multipart/from-data'},
                 })
-                return response.data
+
             }
 
-            const response = await APIInstance.post(`/admin/${groupName}`, {...data})
-            return response.data
+            return await APIInstance.post(`/admin/${groupName}`, data)
         } catch (err) {
             console.log(err)
         }
@@ -48,14 +58,13 @@ export const adminAPI = {
     async changeProduct(groupName, id, data) {
         try {
             if (groupName === "desserts") {
-                const response = await APIInstance.patch(`/admin/${groupName}/${id}`, {...data}, {
+                return await APIInstance.patch(`/admin/${groupName}/${id}`, data, {
                     headers: {'content-type': 'multipart/form-data'},
                 })
-                return response.data
             }
 
-            const response = await APIInstance.patch(`/admin/${groupName}/${id}`, {...data})
-            return response.data
+            return await APIInstance.patch(`/admin/${groupName}/${id}`, data)
+
         } catch (err) {
             console.log(err)
         }
@@ -63,8 +72,7 @@ export const adminAPI = {
 
     async deleteProduct(groupName, id) {
         try {
-            const response = await APIInstance.delete(`/admin/${groupName}/${id}`)
-            return response.data
+            return await APIInstance.delete(`/admin/${groupName}/${id}`)
         } catch (err) {
             console.log(err)
         }
