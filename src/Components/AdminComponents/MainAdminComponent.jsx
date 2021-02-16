@@ -7,7 +7,7 @@ import {
     hotDrinksSelector
 } from "../../Redux/Reducers/AdminReducer/AdminSelectors/MainAdminSelectors";
 
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Typography} from 'antd';
 import {
     UnorderedListOutlined,
     UserOutlined,
@@ -18,6 +18,7 @@ import 'antd/dist/antd.css';
 import {ProductGroupComponent} from "./ProductGroupComponent";
 import {HeaderNavBarComponent} from "./HeaderNavBarComponent";
 import {AdminContentManagerComponent} from "./AdminContentManagerComponent";
+import {signOutRequest} from "../../Redux/Reducers/CommonReducers/CommonReducer";
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -68,7 +69,18 @@ export const MainAdminComponent = React.memo((props) => {
                         <AdminContentManagerComponent currentMenuTab={currentMenuItemKey} currentContentKey={currentContentKey}/>
                     </div>
                 </Content>
-                <Footer style={{textAlign: 'center'}}>Yurii Trach Dessert AR menu</Footer>
+                <Footer style={{textAlign: 'center'}}>
+                    <div>Yurii Trach Dessert AR menu</div>
+                    <div>
+                        <Typography.Link onClick={() => {
+                            dispatch(signOutRequest())
+                        }}>
+                            Logout
+                        </Typography.Link>
+
+                    </div>
+
+                </Footer>
             </Layout>
         </Layout>
 

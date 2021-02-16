@@ -23,6 +23,7 @@ const IS_POTENTIAL_COLUMN = "IS_POTENTIAL_COLUMN";
 const REFRESH_MENU_CREATOR = "REFRESH_MENU_CREATOR";
 const ADD_PRODUCT = "ADD_PRODUCT";
 
+
 const initialState = {
     potentialDesserts: [],
     potentialHotDrinks: [],
@@ -238,8 +239,7 @@ export const adminActions = {
     findCurrentProduct: (productId) => ({type: FIND_CURRENT_PRODUCT, productId}),
     isPotentialColumn: (productId) => ({type: IS_POTENTIAL_COLUMN, productId}),
     refreshMenuCreator: () => ({type: REFRESH_MENU_CREATOR}),
-    addProduct: (productName, product) => ({type: ADD_PRODUCT, productName, product})
-
+    addProduct: (productName, product) => ({type: ADD_PRODUCT, productName, product}),
 };
 
 export const initAllProducts = () => {

@@ -76,5 +76,14 @@ export const adminAPI = {
         } catch (err) {
             console.log(err)
         }
-    }
+    },
+
+    async logout() {
+        try {
+            return await APIInstance.delete(`/logout`, {})
+
+        } catch (err) {
+            console.log(err)
+        }
+    },
 }
