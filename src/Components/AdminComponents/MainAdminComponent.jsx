@@ -50,7 +50,7 @@ export const MainAdminComponent = React.memo((props) => {
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
-                <div className="logo"/>
+                <div className="main_logo"/>
                 <Menu theme="dark" defaultSelectedKeys={[currentMenuItemKey]} mode="inline" onSelect={onSelect}>
                     <Menu.Item key="1" icon={<UnorderedListOutlined />}>
                         Menu

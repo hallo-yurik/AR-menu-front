@@ -19,3 +19,13 @@ export const isAuthorizedSelector = createSelector(
     state => state.menu.isAuthorized,
     isAuthorized => isAuthorized
 )
+
+export const currentMenuSelector = createSelector(
+    state => state.menu.currentMenu,
+    currentMenu => currentMenu
+)
+
+export const currentMenuErrorsSelector = createSelector(
+    state => state.menu.errors,
+    currentMenu => currentMenu
+)

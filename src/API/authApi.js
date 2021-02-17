@@ -34,6 +34,7 @@ export const authAPI = {
             console.log(err)
         }
     },
+
     async signOut() {
         try {
             return await APIInstance.delete(`/admin/logout`)

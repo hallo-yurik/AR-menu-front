@@ -9,6 +9,7 @@ import {CheckIsLoggedHOC} from "./HOCs/CheckIsLoggedHOC";
 import {useDispatch, useSelector} from "react-redux";
 import {isAuthorizedSelector} from "./Redux/Reducers/CommonReducers/CommonSelectors";
 import {checkForAuth} from "./Redux/Reducers/CommonReducers/CommonReducer";
+import {CurrentMenuPage} from "./Components/CommonComponents/CurrentMenuPage";
 
 const App = () => {
 
@@ -31,9 +32,7 @@ const App = () => {
                     </CheckIsLoggedHOC>
                 </Route>
                 <Route exact path={"/"}>
-                    <div>
-                        menu
-                    </div>
+                    <CurrentMenuPage/>
                 </Route>
                 <Route exact path={"/login"}>
                     <CheckIsLoggedHOC

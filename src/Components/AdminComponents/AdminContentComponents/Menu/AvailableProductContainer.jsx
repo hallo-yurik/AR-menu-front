@@ -32,6 +32,7 @@ export const AvailableProductsContainer = (props) => {
                             <SingleProductCard key={el._id} index={index} info={el}/>
                         )
                     })}
+                    {provided.placeholder}
                 </div>
             )}
 
