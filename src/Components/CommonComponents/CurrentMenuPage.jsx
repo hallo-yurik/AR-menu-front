@@ -23,9 +23,9 @@ import {AdminContentManagerComponent} from "../AdminComponents/AdminContentManag
 import {adminFormsActions} from "../../Redux/Reducers/AdminReducer/AdminFormsReducer";
 import {CreateMenuModalComponent} from "../AdminComponents/AdminContentComponents/Menu/Modals/CreateMenuModalComponent";
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
-import {PotentialProductContainer} from "../AdminComponents/AdminContentComponents/Menu/PotentialProductContainer";
-import {AddCurrentProductModalManager} from "../AdminComponents/AdminContentComponents/Menu/AddCurrentProductModalManager";
-import {AvailableProductsContainer} from "../AdminComponents/AdminContentComponents/Menu/AvailableProductContainer";
+import {PotentialProductContainer} from "../AdminComponents/AdminContentComponents/Menu/CreateMenu/PotentialProductContainer";
+import {AddCurrentProductModalManager} from "../AdminComponents/AdminContentComponents/Menu/CreateMenu/AddCurrentProductModalManager";
+import {AvailableProductsContainer} from "../AdminComponents/AdminContentComponents/Menu/CreateMenu/AvailableProductContainer";
 import {isiOS} from "../../Utils/CheckForIOS";
 
 const {Header, Content, Footer} = Layout;
@@ -147,15 +147,11 @@ export const CurrentMenuPage = (props) => {
     useEffect(() => {
         dispatch(initCurrentMenu())
 
-        document.body.style.backgroundColor = "#e1f0ff"
 
         return () => {
-            document.body.style.backgroundColor = "#ffffff"
         }
 
     }, [dispatch])
-
-    console.log(currentMenu)
 
     if (errors.length) return (
 

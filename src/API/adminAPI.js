@@ -70,7 +70,7 @@ export const adminAPI = {
         }
     },
 
-    async deleteProduct(groupName, id) {
+    async deleteProduct(groupName, id) {//desserts, hot-drinks, alcohol
         try {
             return await APIInstance.delete(`/admin/${groupName}/${id}`)
         } catch (err) {

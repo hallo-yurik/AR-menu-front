@@ -218,6 +218,7 @@ export const CreateDessertModal = (props) => {
                 confirmLoading={isSendingDessert}
                 closable
                 maskClosable
+                forceRender
             >
 
                 {dessertErrors.length !== 0 && dessertErrors.length !== null
@@ -236,7 +237,7 @@ export const CreateDessertModal = (props) => {
                     : null
                 }
 
-                <Form form={form} name="dessert" {...formItemLayoutWithOutLabel}>
+                <Form form={form} name="dessert" {...formItemLayoutWithOutLabel} preserve={false}>
                     <Form.Item name="name"
                                label="Name"
                                rules={[{required: true, whitespace: true, message: "Please input dessert's name."}]}

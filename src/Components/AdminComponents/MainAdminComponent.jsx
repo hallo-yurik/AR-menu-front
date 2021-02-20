@@ -22,7 +22,7 @@ import {signOutRequest} from "../../Redux/Reducers/CommonReducers/CommonReducer"
 
 const {Header, Content, Footer, Sider} = Layout;
 
-export const MainAdminComponent = React.memo((props) => {
+export const MainAdminComponent = (props) => {
 
     const [collapsed, setCollapsed] = useState(false)
 
@@ -51,7 +51,7 @@ export const MainAdminComponent = React.memo((props) => {
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
                 <div className="main_logo"/>
-                <Menu theme="dark" defaultSelectedKeys={[currentMenuItemKey]} mode="inline" onSelect={onSelect}>
+                <Menu theme="dark" selectedKeys={[currentMenuItemKey]} mode="inline" onSelect={onSelect}>
                     <Menu.Item key="1" icon={<UnorderedListOutlined />}>
                         Menu
                     </Menu.Item>
@@ -91,4 +91,4 @@ export const MainAdminComponent = React.memo((props) => {
         //     <ProductGroupComponent groupName="potentialAlcohol" productArray={alcoholArray}/>
         // </div>
     )
-})
+}

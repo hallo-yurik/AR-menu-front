@@ -112,6 +112,7 @@ export const CreateHotDrinkModal = (props) => {
                 confirmLoading={isSendingHotDrink}
                 closable
                 maskClosable
+                forceRender
             >
 
                 {hotDrinkErrors.length !== 0 && hotDrinkErrors.length !== null
@@ -130,7 +131,7 @@ export const CreateHotDrinkModal = (props) => {
                     : null
                 }
 
-                <Form form={form} name="hot-drink" {...formItemLayoutWithOutLabel}>
+                <Form form={form} name="hot-drink" {...formItemLayoutWithOutLabel} preserve={false}>
                     <Form.Item name="name"
                                label="Name"
                                rules={[{required: true, whitespace: true, message: "Please input hot drink's name."}]}

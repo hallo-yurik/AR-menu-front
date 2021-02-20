@@ -40,10 +40,14 @@ export const CreateAlcoholModal = (props) => {
     const isSendingAlcohol = useSelector(isAlcoholSendingSelector);
     const alcoholErrors = useSelector(validateAlcoholErrors);
 
+    // console.log(isSendingAlcohol)
+
     // const isSendingHotDrink = false; //selector
     const dispatch = useDispatch()
 
     useEffect(() => {
+
+        // console.log(clearForm)
         if (clearForm) {
             form.resetFields()
         }
@@ -69,36 +73,21 @@ export const CreateAlcoholModal = (props) => {
         try {
             const result = await form.validateFields()
 
-            // console.log(result)
-            dispatch(postAlcoholThunk(result))
-            // await combineFormData(result, dessertImage[0], dessertModel[0])
+            if (alcoholData) {
+                console.log("hello")
+            } else {
 
+                const isSuccessful = await dispatch(postAlcoholThunk(result))
 
+                if (isSuccessful) {
+                    closeModal()
+                }
+            }
         } catch (err) {
             console.log(err)
         }
-        // form.resetFields()
 
-        // result
     }
-
-    // return (
-    //     <>
-    //         <Modal
-    //             visible={isVisible}
-    //             title={hotDrinkData ? "New hot drink" : hotDrinkData.name}
-    //             centered={true}
-    //             width={"50%"}
-    //             // onOk={postMenu}
-    //             onCancel={onClose}
-    //             confirmLoading={isSendingHotDrink}
-    //             closable
-    //             maskClosable
-    //         >
-    //
-    //         </Modal>
-    //     </>
-    // )
 
     return (
         <>
@@ -115,6 +104,8 @@ export const CreateAlcoholModal = (props) => {
                 confirmLoading={isSendingAlcohol}
                 closable
                 maskClosable
+                getContainer={false}
+                forceRender
             >
 
                 {alcoholErrors.length !== 0 && alcoholErrors.length !== null
@@ -133,7 +124,7 @@ export const CreateAlcoholModal = (props) => {
                     : null
                 }
 
-                <Form form={form} name="alcohol" {...formItemLayoutWithOutLabel}>
+                <Form form={form} name="alcohol" {...formItemLayoutWithOutLabel} preserve={false}>
                     <Form.Item name="name"
                                label="Name"
                                rules={[{required: true, whitespace: true, message: "Please input alcohol's name."}]}

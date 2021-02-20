@@ -37,16 +37,9 @@ export const SignupPage = (props) => {
     const [successMessage, setSuccessMessage] = useState([])
     const history = useHistory()
 
-    // history
-
     useEffect(() => {
 
-        console.log(signUpAnswer)
-
         if (signUpAnswer.statusCode >= 400 && signUpAnswer.statusCode < 600) {
-            // console.log("hello")
-
-            // console.log(signInAnswer.message)
             setErrors(signUpAnswer.message)
             setSuccessMessage([])
         }
@@ -54,37 +47,23 @@ export const SignupPage = (props) => {
         if (signUpAnswer.statusCode >= 200 && signUpAnswer.statusCode < 300) {
             setErrors([])
             setSuccessMessage(signUpAnswer.message)
-            // dispatch(commonActions.resetSignUpAnswerStatus())
-            // history.push("/")
         }
-
 
         return () => {
-
             setErrors([])
             setSuccessMessage([])
-            // dispatch(commonActions.resetSignInAnswerStatus())
-            console.log("deleted")
         }
     }, [dispatch, history, signUpAnswer])
-    //
-    // console.log(isLoading)
-    //
-    // useEffect(() => {
-    //     console.log(isLoading)
-    // }, [isLoading])
 
     const onFinish = (values) => {
-
         dispatch(commonActions.resetSignUpAnswerStatus())
-        console.log('Success:', values);
-
         dispatch(signUpRequest(values.username, values.password))
     };
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+
 
     return (
         <div style={{height: '100vh'}}>
@@ -107,7 +86,7 @@ export const SignupPage = (props) => {
                         : null
                     }
 
-                    {successMessage.length !== 0 && errors.length !== null
+                    {successMessage.length !== 0 && successMessage.length !== null
                         ? <List.Item>
                             <List.Item.Meta
                                 title={<Divider><Typography.Text type="success">

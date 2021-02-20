@@ -25,8 +25,9 @@ export const CreateMenuModalComponent = (props) => {
 
 
             <Divider orientation="left">Desserts</Divider>
-            {potentialDessertsArray.map((dessert) => (
+            {potentialDessertsArray.map((dessert, i) => (
                 <Card
+                    key={i}
                     title={dessert.name.toUpperCase()}
                     cover={
                         <img
@@ -46,7 +47,7 @@ export const CreateMenuModalComponent = (props) => {
                         <List.Item.Meta
                             title={<Divider>Ingredients</Divider>}
                             description={
-                                dessert.ingredients.map((ingredient) => <div>{ingredient}</div>)
+                                dessert.ingredients.map((ingredient, i) => <div key={i}>{ingredient}</div>)
                             }
                         />
                     </List.Item>

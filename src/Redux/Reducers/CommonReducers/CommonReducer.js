@@ -104,6 +104,9 @@ export const signUpRequest = (username, password) => {
 
         dispatch(commonActions.setLoading(true))
         const result = await authAPI.signup(username, password);
+
+        console.log(result)
+
         dispatch(commonActions.setSignUpAnswerStatus(result.status, result.data.message))
         dispatch(commonActions.setLoading(false))
     }

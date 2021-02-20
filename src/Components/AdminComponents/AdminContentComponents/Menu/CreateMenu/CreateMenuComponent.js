@@ -10,8 +10,8 @@ import {
     potentialDessertsSelector,
     potentialDropsOpenKeys,
     potentialHotDrinksSelector
-} from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/MainAdminSelectors";
-import {adminActions, initAllProducts} from "../../../../Redux/Reducers/AdminReducer/AdminReducer";
+} from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/MainAdminSelectors";
+import {adminActions, initAllProducts} from "../../../../../Redux/Reducers/AdminReducer/AdminReducer";
 
 import {
     SaveOutlined,
@@ -19,19 +19,19 @@ import {
 } from '@ant-design/icons';
 
 import {Col, Row, Collapse, Button, Checkbox, Select, Modal} from 'antd';
-import "../../../Styles/CreateMenuComponentStyle.css"
+import "../../../../Styles/CreateMenuComponentStyle.css"
 import {AvailableProductsContainer} from "./AvailableProductContainer";
 import {PotentialProductContainer} from "./PotentialProductContainer";
 import {
     adminFormsActions,
     createMenuThunk
-} from "../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
 import {
     isCurrentMenuSelector,
     isMenuSendingSelector, validateMenuErrors
-} from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
-import {CreateMenuModalComponent} from "./Modals/CreateMenuModalComponent";
-import {CreateDessertModal} from "./Modals/CreateDessertModal";
+} from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
+import {CreateMenuModalComponent} from "../Modals/CreateMenuModalComponent";
+import {CreateDessertModal} from "../Modals/CreateDessertModal";
 import {AddCurrentProductModalManager} from "./AddCurrentProductModalManager";
 
 const {Panel} = Collapse;
@@ -129,7 +129,9 @@ export const CreateMenuComponent = React.memo((props) => {
             setModalVisible(false);
         } else {
 
-            const modalElement = document.getElementsByClassName("ant-modal-wrap ant-modal-centered")[0]
+            console.log("))))))0")
+
+            const modalElement = document.getElementsByClassName("ant-modal-wrap ant-modal-centered")[1]
             modalElement.scrollTo({top: 0, behavior: "smooth"})
 
         }
@@ -321,6 +323,7 @@ export const CreateMenuComponent = React.memo((props) => {
                                confirmLoading={isSendingMenu}
                                closable={false}
                                maskClosable={false}
+                               forceRender
                             // ref={modalRef}
                         >
                             <CreateMenuModalComponent potentialDessertsArray={potentialDessertsArray}
@@ -406,8 +409,6 @@ export const CreateMenuComponent = React.memo((props) => {
                             product={currentProduct}
                             isVisible={createProductModalVisible}
                             onCancel={closeCreateProductModal}/>
-
-                        {/*<CreateDessertModal isVisible={createMenuModalVisible} onClose={setCreateMenuModalVisible}/>*/}
                     </div>
                     <AvailableProductsContainer
                         productArray={currentProductArray}

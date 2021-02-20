@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {SingleProductCard} from "./SingleProductCard";
 import {Droppable} from "react-beautiful-dnd";
 import {useDispatch} from "react-redux";
-import {adminActions} from "../../../../Redux/Reducers/AdminReducer/AdminReducer";
+import {adminActions} from "../../../../../Redux/Reducers/AdminReducer/AdminReducer";
 
 export const AvailableProductsContainer = (props) => {
 

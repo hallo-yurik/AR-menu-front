@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import {Modal} from "antd";
-import {adminFormsActions} from "../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
-import {CreateDessertModal} from "./Modals/CreateDessertModal";
+import {adminFormsActions} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {CreateDessertModal} from "../Modals/CreateDessertModal";
 import {useSelector} from "react-redux";
 import {
+    isAlcoholSendingSelector,
     validateAlcoholErrors,
     validateDessertErrors,
     validateHotDrinkErrors
-} from "../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
-import {CreateHotDrinkModal} from "./Modals/CreateHotDrinkModal";
-import {CreateAlcoholModal} from "./Modals/CreateAlcoholModal";
+} from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
+import {CreateHotDrinkModal} from "../Modals/CreateHotDrinkModal";
+import {CreateAlcoholModal} from "../Modals/CreateAlcoholModal";
 
 export const AddCurrentProductModalManager = (props) => {
 
@@ -24,30 +25,30 @@ export const AddCurrentProductModalManager = (props) => {
 
     useEffect(() => {
 
-        if (product === "Desserts") {
-
-            if (dessertErrors.length === 0 && isVisible) {
-                setClearForm(true)
-                onCancel()
-                setClearForm(false)
-            }
-        }
-
-        if (product === "HotDrinks" && isVisible) {
-            if (hotDrinksErrors.length === 0 && isVisible) {
-                setClearForm(true)
-                onCancel()
-                setClearForm(false)
-            }
-        }
-
-        if (product === "Alcohol" && isVisible) {
-            if (alcoholErrors.length === 0 && isVisible) {
-                setClearForm(true)
-                onCancel()
-                setClearForm(false)
-            }
-        }
+        // if (product === "Desserts" && isVisible) {
+        //
+        //     if (dessertErrors.length === 0) {
+        //         setClearForm(true)
+        //         onCancel()
+        //         setClearForm(false)
+        //     }
+        // }
+        //
+        // if (product === "HotDrinks" && isVisible) {
+        //     if (hotDrinksErrors.length === 0) {
+        //         setClearForm(true)
+        //         onCancel()
+        //         setClearForm(false)
+        //     }
+        // }
+        //
+        // if (product === "Alcohol" && isVisible) {
+        //     if (alcoholErrors.length === 0) {
+        //         setClearForm(true)
+        //         onCancel()
+        //         setClearForm(false)
+        //     }
+        // }
 
 
 

@@ -32,7 +32,7 @@ const initialState = {
     availableHotDrinks: [],
     availableAlcohol: [],
     currentMenuTabKey: "1",
-    currentContentKey: "1",
+    currentContentKey: "2",
     currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
     potentialDropsAreOpenKeys: [],
     isPotentialColumn: false
@@ -183,17 +183,22 @@ const adminReducer = (state = initialState, action) => {
 
             return {
                 ...state,
-                potentialDesserts: [],
-                potentialHotDrinks: [],
-                potentialAlcohol: [],
-                availableDesserts: [],
-                availableHotDrinks: [],
-                availableAlcohol: [],
-                currentMenuTabKey: "1",
-                currentContentKey: "1",
+
+
+                // currentMenuTabKey: state.currentMenuTabKey,
+                // currentContentKey: state.currentContentKey,
+                // ...initialState
+                potentialDesserts: initialState.potentialDesserts,
+                potentialHotDrinks: initialState.potentialHotDrinks,
+                potentialAlcohol: initialState.potentialAlcohol,
+                availableDesserts: initialState.availableDesserts,
+                availableHotDrinks: initialState.availableHotDrinks,
+                availableAlcohol: initialState.availableAlcohol,
+                // currentMenuTabKey: "1",
+                // currentContentKey: "1",
                 currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
-                potentialDropsAreOpenKeys: [],
-                isPotentialColumn: false
+                potentialDropsAreOpenKeys: initialState.potentialDropsAreOpenKeys,
+                isPotentialColumn: initialState.isPotentialColumn
             }
         case ADD_PRODUCT:
             //Desserts, HotDrinks, Alcohol

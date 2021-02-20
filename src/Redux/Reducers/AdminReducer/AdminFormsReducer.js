@@ -1,5 +1,6 @@
 import {adminAPI} from "../../../API/adminAPI";
 import {adminActions} from "./AdminReducer";
+import {adminProductsActions, initAlcohol} from "./AdminProductsReducer";
 
 const SET_CREATE_MENU_DATA = "SET_CREATE_MENU_DATA";
 const SET_IS_CURRENT_MENU = "SET_IS_CURRENT_MENU";
@@ -96,8 +97,8 @@ export const createMenuThunk = (dessertsIdsArray, hotDrinksIdsArray, alcoholIdsA
 
             // dispatch(adminFormsActions.clearErrors())
 
-            // const response = await adminAPI.createMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrent)
-            const response = await adminAPI.createMenu([], [], [], isCurrent)
+            const response = await adminAPI.createMenu(dessertsIdsArray, hotDrinksIdsArray, alcoholIdsArray, isCurrent)
+            // const response = await adminAPI.createMenu([], [], [], isCurrent)
 
             if (response.status >= 400 && response.status < 600) {
                 dispatch(adminFormsActions.handleErrors(response.data.message))
@@ -176,7 +177,6 @@ export const postHotDrinkThunk = (data) => {
 export const postAlcoholThunk = (data) => {
     return async dispatch => {
         try {
-
             dispatch(adminFormsActions.sendingAlcohol(true))
 
             // const response = await adminAPI.createProduct("alcohol", {})
@@ -186,12 +186,16 @@ export const postAlcoholThunk = (data) => {
                 dispatch(adminFormsActions.postAlcohol(response, false))
             } else {
                 dispatch(adminFormsActions.postAlcohol(response, true))
+                await dispatch(initAlcohol())
+
                 //Desserts, HotDrinks, Alcohol
                 dispatch(adminActions.addProduct("Alcohol", response.data))
-                console.log(response.data)
-            }
 
+            }
             dispatch(adminFormsActions.sendingAlcohol(false))
+
+            return !(response.status >= 400 && response.status < 600);
+
 
         } catch (err) {
             console.log(err)

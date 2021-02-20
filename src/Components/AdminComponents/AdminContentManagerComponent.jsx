@@ -1,7 +1,7 @@
 import React from 'react'
-import {CreateMenuComponent} from "./AdminContentComponents/Menu/CreateMenuComponent";
-import {ProductsComponent} from "./AdminContentComponents/Menu/ProductsComponent";
-import {MenusComponent} from "./AdminContentComponents/Menu/MenusComponent";
+import {CreateMenuComponent} from "./AdminContentComponents/Menu/CreateMenu/CreateMenuComponent";
+import {ProductsComponent} from "./AdminContentComponents/Menu/Products/ProductsComponent";
+import {MenusComponent} from "./AdminContentComponents/Menu/Menus/MenusComponent";
 import {WaitingComponent} from "./AdminContentComponents/Users/WaitingComponent";
 import {BlockListComponent} from "./AdminContentComponents/Users/BlockListComponent";
 import {AllowedComponent} from "./AdminContentComponents/Users/AllowedComponent";
@@ -48,6 +48,8 @@ const returnUsersContent = (currentContentKey) => {
 export const AdminContentManagerComponent = (props) => {
 
     const {currentMenuTab, currentContentKey} = props;
+
+    // console.log(currentMenuTab, currentContentKey)
     const currentComponent = choseAppropriateMenu(currentMenuTab)(currentContentKey)
 
     return (currentComponent)
