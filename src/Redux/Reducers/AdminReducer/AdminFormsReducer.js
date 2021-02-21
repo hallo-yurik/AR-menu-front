@@ -1,6 +1,6 @@
 import {adminAPI} from "../../../API/adminAPI";
 import {adminActions} from "./AdminReducer";
-import {adminProductsActions, initAlcohol} from "./AdminProductsReducer";
+import {adminProductsActions, initAlcohol, initDesserts, initHotDrinks} from "./AdminProductsReducer";
 
 const SET_CREATE_MENU_DATA = "SET_CREATE_MENU_DATA";
 const SET_IS_CURRENT_MENU = "SET_IS_CURRENT_MENU";
@@ -129,9 +129,12 @@ export const postDessertThunk = (formData) => {
             } else {
                 dispatch(adminFormsActions.postDessert(response, true))
                 dispatch(adminActions.addProduct("Desserts", response.data))
+                await dispatch(initDesserts())
             }
 
             dispatch(adminFormsActions.sendingDessert(false))
+
+
 
             return !(response.status >= 400 && response.status < 600);
 
@@ -152,9 +155,10 @@ export const postHotDrinkThunk = (data) => {
                 dispatch(adminFormsActions.postHotDrink(response, false))
             } else {
                 dispatch(adminFormsActions.postHotDrink(response, true))
+                await dispatch(initHotDrinks())
                 //Desserts, HotDrinks, Alcohol
                 dispatch(adminActions.addProduct("HotDrinks", response.data))
-                console.log(response.data)
+                // console.log(response.data)
             }
 
             dispatch(adminFormsActions.sendingHotDrink(false))

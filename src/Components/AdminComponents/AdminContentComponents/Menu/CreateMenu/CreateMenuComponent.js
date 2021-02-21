@@ -128,9 +128,6 @@ export const CreateMenuComponent = React.memo((props) => {
         if (validateMenuErrorsArray.length === 0) {
             setModalVisible(false);
         } else {
-
-            console.log("))))))0")
-
             const modalElement = document.getElementsByClassName("ant-modal-wrap ant-modal-centered")[1]
             modalElement.scrollTo({top: 0, behavior: "smooth"})
 
