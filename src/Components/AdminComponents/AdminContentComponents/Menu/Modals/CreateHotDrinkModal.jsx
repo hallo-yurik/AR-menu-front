@@ -4,14 +4,16 @@ import {useDispatch, useSelector} from "react-redux";
 import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import {
+    isAlcoholSendingSelector,
     isDessertSendingSelector,
-    isHotDrinkSendingSelector, validateDessertErrors, validateHotDrinkErrors
+    isHotDrinkSendingSelector, validateAlcoholErrors, validateDessertErrors, validateHotDrinkErrors
 } from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
 import {
-    adminFormsActions,
+    adminFormsActions, postAlcoholThunk,
     postDessertThunk,
     postHotDrinkThunk
 } from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {patchAlcoholThunk, patchHotDrinkThunk} from "../../../../../Redux/Reducers/AdminReducer/AdminProductsReducer";
 
 const formItemLayoutWithOutLabel = {
     wrapperCol: {
@@ -33,7 +35,7 @@ const formItemLayout = {
 
 export const CreateHotDrinkModal = (props) => {
 
-    const {isVisible, closeModal, hotDrinkData, clearForm} = props //TODO
+    const {isVisible, closeModal, hotDrinkData, clearForm} = props
 
     const isSendingHotDrink = useSelector(isHotDrinkSendingSelector);
     const hotDrinkErrors = useSelector(validateHotDrinkErrors);
@@ -55,47 +57,41 @@ export const CreateHotDrinkModal = (props) => {
 
     }, [form, isVisible])
 
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch(adminFormsActions.clearErrors())
-    //     }
-    // }, [dispatch])
 
     const onFormSubmit = async () => {
 
         try {
             const result = await form.validateFields()
+            let isSuccessful;
+            if (hotDrinkData) {
+                isSuccessful = await dispatch(patchHotDrinkThunk(hotDrinkData.id, result))
+            } else {
+                isSuccessful = await dispatch(postHotDrinkThunk(result))
+            }
 
-            // console.log(result)
-            dispatch(postHotDrinkThunk(result))
-            // await combineFormData(result, dessertImage[0], dessertModel[0])
-
+            if (isSuccessful) {
+                dispatch(adminFormsActions.clearErrors())
+                form.resetFields()
+                closeModal()
+            }
 
         } catch (err) {
             console.log(err)
         }
-        // form.resetFields()
 
-        // result
     }
 
-    // return (
-    //     <>
-    //         <Modal
-    //             visible={isVisible}
-    //             title={hotDrinkData ? "New hot drink" : hotDrinkData.name}
-    //             centered={true}
-    //             width={"50%"}
-    //             // onOk={postMenu}
-    //             onCancel={onClose}
-    //             confirmLoading={isSendingHotDrink}
-    //             closable
-    //             maskClosable
-    //         >
+
+    // const onFormSubmit = async () => {
     //
-    //         </Modal>
-    //     </>
-    // )
+    //     try {
+    //         const result = await form.validateFields()
+    //
+    //         dispatch(postHotDrinkThunk(result))
+    //     } catch (err) {
+    //         console.log(err)
+    //     }
+    // }
 
     return (
         <>

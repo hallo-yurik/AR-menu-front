@@ -129,10 +129,11 @@ export const postDessertThunk = (formData) => {
             } else {
                 dispatch(adminFormsActions.postDessert(response, true))
                 dispatch(adminActions.addProduct("Desserts", response.data))
-                console.log(response.data)
             }
 
             dispatch(adminFormsActions.sendingDessert(false))
+
+            return !(response.status >= 400 && response.status < 600);
 
         } catch (err) {
             console.log(err)
@@ -143,20 +144,10 @@ export const postDessertThunk = (formData) => {
 export const postHotDrinkThunk = (data) => {
     return async dispatch => {
         try {
-
-            // console.log(data)
-
             dispatch(adminFormsActions.sendingHotDrink(true))
 
-            // dispatch(adminFormsActions.clearErrors())
-            //
-            // const response = await adminAPI.createProduct("hot-drinks", {})
             const response = await adminAPI.createProduct("hot-drinks", data)
 
-
-
-
-            console.log(response, data)
             if (response.status >= 400 && response.status < 600) {
                 dispatch(adminFormsActions.postHotDrink(response, false))
             } else {
@@ -165,8 +156,10 @@ export const postHotDrinkThunk = (data) => {
                 dispatch(adminActions.addProduct("HotDrinks", response.data))
                 console.log(response.data)
             }
-            //
+
             dispatch(adminFormsActions.sendingHotDrink(false))
+
+            return !(response.status >= 400 && response.status < 600);
 
         } catch (err) {
             console.log(err)

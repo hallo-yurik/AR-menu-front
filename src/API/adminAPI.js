@@ -58,6 +58,7 @@ export const adminAPI = {
     async changeProduct(groupName, id, data) {
         try {
             if (groupName === "desserts") {
+
                 return await APIInstance.patch(`/admin/${groupName}/${id}`, data, {
                     headers: {'content-type': 'multipart/form-data'},
                 })

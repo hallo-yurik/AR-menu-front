@@ -2,13 +2,19 @@ import React, {useState, useEffect} from 'react'
 import {Button, Divider, Form, Image, Input, InputNumber, List, message, Modal, Typography, Upload} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import {MinusCircleOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
-import {adminFormsActions, postDessertThunk} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {
+    adminFormsActions,
+    postDessertThunk,
+    postHotDrinkThunk
+} from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
 import "../../../../Styles/CreateDessertModalStyle.css"
 import ImgCrop from "antd-img-crop";
 import {
-    isDessertSendingSelector,
+    isAlcoholSendingSelector,
+    isDessertSendingSelector, validateAlcoholErrors,
     validateDessertErrors
 } from "../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
+import {patchDessertThunk, patchHotDrinkThunk} from "../../../../../Redux/Reducers/AdminReducer/AdminProductsReducer";
 
 const formItemLayout = {
     labelCol: {
@@ -39,44 +45,57 @@ export const CreateDessertModal = (props) => {
 
     const dispatch = useDispatch()
     const [form] = Form.useForm();
+
     const [imageFileType, setImageFileType] = useState(null)
     const [dessertImage, setDessertImage] = useState([])
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false)
     const [dessertModel, setDessertModel] = useState([])
 
-    // useEffect(() => {
-    //     return () => {
-    //         setImageFileType(null)
-    //         dispatch(adminFormsActions.clearErrors())
-    //     }
-    // }, [dispatch])
-
-
     useEffect(() => {
         if (dessertData) {
-            setDessertImage([{
-                uid: dessertData._id,
-                name: dessertData.name,
-                url: dessertData.image,
-                status: "done"
-            }])
 
-            setDessertModel([{
-                uid: dessertData._id,
-                name: dessertData.name,
-                url: dessertData.ar,
-                status: "done"
-            }])
+            fetch(dessertData.image).then(r => r.blob().then(blob => {
+
+                const file = new File([blob], dessertData.name + ".png", {
+                    type: "image/png"
+                });
+
+                setDessertImage([{
+                    uid: dessertData.id,
+                    name: dessertData.name + ".png",
+                    url: dessertData.image,
+                    status: "done",
+                    originFileObj: file,
+                    thumbUrl: dessertData.image
+                }])
+
+                setImageFileType("image/png")
+
+            }));
+
+            fetch(dessertData.ar).then(r => r.blob().then(blob => {
+
+                const file = new File([blob], dessertData.name + ".usdz");
+
+                setDessertModel([{
+                    uid: dessertData.id,
+                    name: dessertData.name + ".usdz",
+                    status: "done",
+                    url: dessertData.image,
+                    originFileObj: file
+                }])
+            }));
         }
         return () => {
+
             setDessertImage([])
             setDessertModel([])
         }
     }, [dessertData])
 
-
     useEffect(() => {
         if (!isVisible) {
+
             form.resetFields()
             setDessertModel([])
             setDessertImage([])
@@ -91,9 +110,10 @@ export const CreateDessertModal = (props) => {
 
     useEffect(() => {
         if (clearForm) {
+            // console.log("reset")
             form.resetFields()
-            setDessertModel([])
-            setDessertImage([])
+            // setDessertModel([])
+            // setDessertImage([])
         }
     }, [clearForm, form])
 
@@ -103,19 +123,13 @@ export const CreateDessertModal = (props) => {
             const result = await form.validateFields()
             await combineFormData(result, dessertImage[0], dessertModel[0])
 
-
         } catch (err) {
             console.log(err)
         }
-        // form.resetFields()
-
-        // result
     }
 
     const combineFormData = async (result, dessertImage, dessertModel) => {
         try {
-
-            // console.log(dessertImage, dessertModel)
 
             const dessertFormData = new FormData()
             dessertFormData.set("name", result.name);
@@ -124,7 +138,25 @@ export const CreateDessertModal = (props) => {
             dessertFormData.set("dessert_image", dessertImage.originFileObj, dessertImage.name);
             dessertFormData.set("dessert_model", dessertModel.originFileObj, dessertModel.name);
 
-            dispatch(postDessertThunk(dessertFormData))
+            let isSuccessful;
+
+            if (dessertData) {
+
+                // console.log(dessertImage.originFileObj, dessertModel.originFileObj, dessertData)
+
+                isSuccessful = await dispatch(patchDessertThunk(dessertData.id, dessertFormData))
+            } else {
+                isSuccessful = await dispatch(postDessertThunk(dessertFormData))
+            }
+
+            if (isSuccessful) {
+
+                dispatch(adminFormsActions.clearErrors())
+                form.resetFields()
+                setDessertModel([])
+                setDessertImage([])
+                closeModal()
+            }
 
             // name: type: text, format: String
             // ingredients: [type: text, format: String]
@@ -174,6 +206,7 @@ export const CreateDessertModal = (props) => {
 
 
     const onChange = async ({file, fileList: newFileList}) => {
+
         if (newFileList.length) {
             newFileList[0].status = "done"
             setImageFileType(file.type)
@@ -189,7 +222,6 @@ export const CreateDessertModal = (props) => {
     }
 
     const onPreview = async file => {
-        console.log(file)
         let src = file.url;
         if (!src) {
             src = await new Promise(resolve => {
@@ -259,7 +291,7 @@ export const CreateDessertModal = (props) => {
                                 },
                             },
                         ]}
-                        initialValue={dessertData ? [dessertData.ingredients] : [""]}
+                        initialValue={dessertData ? dessertData.ingredients : [""]}
                     >
                         {(fields, {add, remove, move}, {errors}) => (
                             <>
@@ -374,12 +406,12 @@ export const CreateDessertModal = (props) => {
                     <Form.Item
                         name={"dessert_model"}
                         label={"Model"}
-                        valuePropName={"fileList"}
-                        getValueFromEvent={(e) => {
-
-
-                            // console.log(e)
-                        }}
+                        // valuePropName={"fileList"}
+                        // getValueFromEvent={(e) => {
+                        //
+                        //
+                        //     // console.log(e)
+                        // }}
                         required={true}
                         colon={false}
                         rules={[
@@ -399,10 +431,18 @@ export const CreateDessertModal = (props) => {
                         {...formItemLayout}>
 
                         <Upload
-                            listType="picture"
+                            listType="text"
                             maxCount={1}
                             onChange={onModelChange}
                             fileList={dessertModel}
+                            // fileList={[
+                            //     {
+                            //         uid: '-1',
+                            //         name: 'image.png',
+                            //         status: 'done',
+                            //         url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                            //     },
+                            // ]}
                         >
                             <Button icon={<UploadOutlined/>}>Upload USDZ model</Button>
                         </Upload>

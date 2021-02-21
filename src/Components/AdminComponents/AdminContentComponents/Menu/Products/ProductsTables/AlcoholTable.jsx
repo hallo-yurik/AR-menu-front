@@ -14,7 +14,10 @@ import {
     EditOutlined
 } from '@ant-design/icons';
 import {CreateAlcoholModal} from "../../Modals/CreateAlcoholModal";
-import {isAlcoholSendingSelector} from "../../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
+import {
+    isAlcoholSendingSelector,
+    validateAlcoholErrors
+} from "../../../../../../Redux/Reducers/AdminReducer/AdminSelectors/AdminFormsSelectors";
 
 const {Title} = Typography;
 
@@ -30,6 +33,7 @@ export const AlcoholTable = (props) => {
     const allAlcohol = useSelector(allAlcoholSelector)
     const deletingId = useSelector(deletingIdSelector)
     const editingId = useSelector(editingIdSelector)
+    // const alcoholErrors = useSelector(validateAlcoholErrors);
 
     useEffect(() => {
         dispatch(initAlcohol())

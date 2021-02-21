@@ -13,6 +13,7 @@ import {
     postDessertThunk,
     postHotDrinkThunk
 } from "../../../../../Redux/Reducers/AdminReducer/AdminFormsReducer";
+import {patchAlcoholThunk} from "../../../../../Redux/Reducers/AdminReducer/AdminProductsReducer";
 
 const formItemLayoutWithOutLabel = {
     wrapperCol: {
@@ -60,29 +61,24 @@ export const CreateAlcoholModal = (props) => {
 
     }, [form, isVisible])
 
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch(adminFormsActions.clearErrors())
-    //     }
-    // }, [dispatch])
-
-
-
     const onFormSubmit = async () => {
 
         try {
             const result = await form.validateFields()
-
+            let isSuccessful;
             if (alcoholData) {
-                console.log("hello")
+                isSuccessful = await dispatch(patchAlcoholThunk(alcoholData.id, result))
+
             } else {
-
-                const isSuccessful = await dispatch(postAlcoholThunk(result))
-
-                if (isSuccessful) {
-                    closeModal()
-                }
+                isSuccessful = await dispatch(postAlcoholThunk(result))
             }
+
+            if (isSuccessful) {
+                dispatch(adminFormsActions.clearErrors())
+                form.resetFields()
+                closeModal()
+            }
+
         } catch (err) {
             console.log(err)
         }
@@ -98,6 +94,7 @@ export const CreateAlcoholModal = (props) => {
                 width={"50%"}
                 onOk={onFormSubmit}
                 onCancel={() => {
+
                     dispatch(adminFormsActions.clearErrors())
                     closeModal()
                 }}
