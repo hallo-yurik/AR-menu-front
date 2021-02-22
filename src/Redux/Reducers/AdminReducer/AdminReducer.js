@@ -23,7 +23,6 @@ const IS_POTENTIAL_COLUMN = "IS_POTENTIAL_COLUMN";
 const REFRESH_MENU_CREATOR = "REFRESH_MENU_CREATOR";
 const ADD_PRODUCT = "ADD_PRODUCT";
 
-
 const initialState = {
     potentialDesserts: [],
     potentialHotDrinks: [],
@@ -32,7 +31,7 @@ const initialState = {
     availableHotDrinks: [],
     availableAlcohol: [],
     currentMenuTabKey: "1",
-    currentContentKey: "2",
+    currentContentKey: "1",
     currentProductName: "Desserts", //Desserts, HotDrinks, Alcohol
     potentialDropsAreOpenKeys: [],
     isPotentialColumn: false

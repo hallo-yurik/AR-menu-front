@@ -46,9 +46,9 @@ export const DessertsTable = (props) => {
             width: "50%",
             content: (
                 <>
-                    <Title level={4}>Name: {"test"}</Title>
-                    <Title level={4}>Volume: {"test"}</Title>
-                    <Title level={4}>Price: {"test"}</Title>
+                    <Title level={4}>Name: {data.name}</Title>
+                    {/*<Title level={4}>Volume: {"test"}</Title>*/}
+                    <Title level={4}>Price: {data.price}</Title>
                 </>
             ),
             centered: true,
